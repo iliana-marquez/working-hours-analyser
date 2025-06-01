@@ -30,4 +30,16 @@ def fetch_calendar():
         print("Error fetching calendar:", e)
 
 
-fetch_calendar()
+def fetch_worksheet():
+    """
+    test function to check API connection and fetch worksheet info
+    """
+    try:
+        reports = SHEET.worksheet('reports').get_all_values()
+        headings = reports 
+        print(headings)
+    except Exception as e:
+        print("Error fetching worksheet:", e)
+
+
+fetch_worksheet()
