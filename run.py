@@ -1,6 +1,7 @@
 import gspread
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
+import holidays
 # from datetime import datetime, date, timedelta
 
 SCOPE = [
@@ -34,12 +35,29 @@ def fetch_worksheet():
     """
     test function to check API connection and fetch worksheet info
     """
+    worksheet_name = input("please enter the name of your worksheet")
     try:
-        reports = SHEET.worksheet('reports').get_all_values()
-        headings = reports 
+        reports = SHEET.worksheet(worksheet_name).get_all_values()
+        headings = reports
         print(headings)
     except Exception as e:
         print("Error fetching worksheet:", e)
 
 
+def fetch_holidays(year):
+    """
+    test function to check Holyday dependency and fetch holidays info
+    """
+    country = input("Please type your country code:\n")
+    holiday_list = holidays.country_holidays(country, years=year)
+    for date, name in holiday_list.items():
+        print(f"{date}: {name}")
+
+
+print("Testing google calendar connection:")
+fetch_calendar()
+print("Testing google worksheet connection:")
 fetch_worksheet()
+print("testing holiday library connection:")
+fetch_holidays(2025)
+print("we are good to go")
