@@ -119,6 +119,8 @@ class WorkCalendar(Calendar):
         """
         To create an instance of WorkCalendar by collecting user input
         including an optional title filter
+        (workcal_class not passed into the super().from_input()
+        as it will internally use workcal_class)
         """
         calendar = super().from_input()
         title_filter = input("Enter a keyword or event title to filter your work events or press enter to skip:\n>").strip() or None
@@ -183,6 +185,16 @@ class WorkCalendar(Calendar):
         shifts = self.get_shifts(start_date, end_date, all_day_policy)
         return sum(shift["duration"] for shift in shifts)
 
+    def calculate_worked_days(self, start_date, end_date, all_day_policy: str = "omit") -> int:
+        """
+        To return the number of unique days with at least one shift worked
+        using a set of dates to automatically remove
+        duplicate date objects (shift["start"])
+        """
+        shifts = self.get_shifts(start_date, end_date, all_day_policy)
+        worked_days = {shift["start"].date() for shift in shifts}
+        return len(worked_days)
+
 
 def get_calendar_data() -> WorkCalendar:
     """
@@ -208,7 +220,7 @@ class VacationCalendar(Calendar):
         To fetch the period filtered events of this instance
         and filters them by title if requested
         """
-        self.fetch_events_by_period(start_date, end_date)
+        self.fetch_events_by_period(start_date, end_date, all_day_policy)
         return self.filter_events_by_title(self.title_filter)
 
 
@@ -243,6 +255,7 @@ def main_testing():
     print("\n>>> Calculating total worked hours (all-day policy = '8hr')...")
     total_hours = work_calendar.calculate_worked_hours(start, end, all_day_policy="8hr")
     print(f"Total worked hours: {total_hours:.2f} hrs")
-
+    total_worked_days = work_calendar.calculate_worked_days(start, end, all_day_policy="8hr")
+    print(f"Total worked days: {total_worked_days}")
 
 main_testing()
