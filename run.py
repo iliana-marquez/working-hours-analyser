@@ -210,8 +210,8 @@ class VacationCalendar(Calendar):
         To create an instance of VacationCalendar by collecting user input
         including an optional title filter
         """
-        calendar = super().from_input(vacationcal_class)
-        title_filter = input("Enter a keyword or event title to filter vacation events or press Enter to skip:\n>").strip() or None
+        calendar = super().from_input()
+        title_filter = input("Enter a keyword or event title to filter your vacation events or press Enter to skip:\n>").strip() or None
         calendar.title_filter = title_filter
         return calendar
 
@@ -220,19 +220,53 @@ class VacationCalendar(Calendar):
         To fetch the period filtered events of this instance
         and filters them by title if requested
         """
-        self.fetch_events_by_period(start_date, end_date, all_day_policy)
+        self.fetch_events_by_period(start_date, end_date)
         return self.filter_events_by_title(self.title_filter)
+
+    def calculate_vacation_days(self, start_date: date, end_date: date) -> int:
+        """
+        To calculate the number of vacation days between start_date and end_date,
+        from filtered events, clipping any multi-day events to stay within bounds.
+        """
+        vacation_events = self.fetch_filtered_events(start_date, end_date)
+        vacation_days = set()
+        for vacation_event in vacation_events:
+            start_info = vacation_event.get("start", {})
+            end_info = vacation_event.get("end", {})
+            start_str = start_info.get("dateTime") or start_info.get("date")
+            end_str = end_info.get("dateTime") or end_info.get("date")
+            try:
+                date_start = parse(start_str).date()
+                date_end = parse(end_str).date()
+                if "date" in start_info and "date" in end_info:
+                    date_end -= timedelta(days=1)
+                clipped_start = max(date_start, start_date)
+                clipped_end = min(date_end, end_date)
+                if clipped_start <= clipped_end:
+                    for single_day in range((clipped_end - clipped_start).days + 1):
+                        day = clipped_start + timedelta(days=single_day)
+                        vacation_days.add(day)
+            except Exception as e:
+                print(f"Skipping event due to error: {e}")
+        return len(vacation_days)
+
+
+def get_vacation_calendar() -> VacationCalendar:
+    """
+    To test the Calendar class with user input
+    """
+    return VacationCalendar.from_input()
 
 
 def main_testing():
-    # print("-------------------------------------------")
-    # print("👋 Welcome to the Working Hours Analyser!🔍")
-    # print("-------------------------------------------")
-    # user = get_user_data()
-    # print("\nUser data succesfully collected:")
-    # print(f"Name: {user.name}")
-    # print(f"Name: {user.weekly_contract_hours}")
-    # print(f"Name: {user.country_code}")
+    print("-------------------------------------------")
+    print("👋 Welcome to the Working Hours Analyser!🔍")
+    print("-------------------------------------------")
+    user = get_user_data()
+    print("\nUser data succesfully collected:")
+    print(f"Name: {user.name}")
+    print(f"Week Hours: {user.weekly_contract_hours}")
+    print(f"Country Code: {user.country_code}")
     work_calendar = get_calendar_data()
     start = date(2025, 1, 1)
     end = date(2025, 1, 31)
@@ -245,7 +279,7 @@ def main_testing():
         print(f"\n No events found between {start} and {end}.")
     else:
         print(f"\n Found {len(events)} event(s):")
-        for event in events:  
+        for event in events:
             print("•", event.get("summary", "No Title"))
     print("\n-------------------------------------------")
     print("Shifts")
@@ -260,6 +294,23 @@ def main_testing():
     total_worked_days = work_calendar.calculate_worked_days(start, end, all_day_policy="8hr")
     print(f"Total worked days: {total_worked_days}")
     print("-------------------------------------------\n")
+    vacation_calendar = get_vacation_calendar()
+    vacations = vacation_calendar.fetch_filtered_events(start, end)
+    print(f"\n>>>Fetching vacations between {start} and {end}...")
+    print("-------------------------------------------")
+    print("Vacation Events")
+    print("-------------------------------------------")
+    if not vacations:
+        print(f"\n No events found between {start} and {end}.")
+    else:
+        print(f"\n Found {len(vacations)} event(s):")
+        for vacation in vacations:
+            print("•", vacation.get("summary", "No Title"))
+    print("\n>>>Calculating your vacations days...")
+    print("\n-------------------------------------------")
+    vacations_days = vacation_calendar.calculate_vacation_days(start, end)
+    print(f"Total Vacations Days: {vacations_days}")
+    print("-------------------------------------------")
 
 
 main_testing()
