@@ -3,6 +3,7 @@ from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 import holidays
 from datetime import datetime, date, timedelta, time
+from dateutil.parser import parse
 from typing import Optional, List
 
 SCOPE = [
@@ -59,9 +60,10 @@ def get_user_data() -> User:
 
 
 class Calendar:
-    def __init__(self, calendar_id: str):
+    def __init__(self, calendar_id: str, title_filter: Optional[str] = None):
         self.calendar_id = calendar_id
         self.events: List[dict] = []
+        self.title_filter = title_filter
 
     @classmethod
     def from_input(calendar_class):
@@ -72,12 +74,12 @@ class Calendar:
             calendar_id = input("Please enter the ID of your work calendar (e.g., 'primary'):\n>").strip()
             if calendar_id:
                 break
-            print("Please enter your calendar ID:\n")
+            print("Calendar ID cannot be empty. Please enter your calendar ID.\n")
         return calendar_class(calendar_id)
 
     def fetch_events_by_period(self, start_date: date, end_date: date) -> List[dict]:
         """
-        Fetches events from the calendar using its ID 
+        Fetches events from the calendar using its ID
         within a given period of time.
         """
         try:
@@ -109,41 +111,138 @@ class Calendar:
             if title_filter.lower() in event.get("summary", "").lower()
         ]
         return filtered_events
-    
-def get_calendar_data() -> Calendar:
+
+
+class WorkCalendar(Calendar):
+    @classmethod
+    def from_input(workcal_class):
+        """
+        To create an instance of WorkCalendar by collecting user input
+        including an optional title filter
+        """
+        calendar = super().from_input()
+        title_filter = input("Enter a keyword or event title to filter your work events or press enter to skip:\n>").strip() or None
+        calendar.title_filter = title_filter
+        return calendar
+
+    def fetch_filtered_events(self, start_date, end_date):
+        """
+        To fetch the period filtered events of this instance
+        and filters them by title if requested
+        """
+        self.fetch_events_by_period(start_date, end_date)
+        return self.filter_events_by_title(self.title_filter)
+
+    def get_shifts(self, start_date, end_date, all_day_policy: str = "omit") -> list[dict]:
+        """
+        Fetches filtered events to return a list of shifts
+        with parsed start, end, duration.
+        all_day_policy (str): Determines how to handle all-day events
+            - "omit" (default): Skip all-day event
+            - "8hr": Count all-day events as 8-hour shifts
+            - "24hr": Count all-day events as 24-hour shifts
+        """
+        events = self.fetch_events_by_period(start_date, end_date)
+        shifts = []
+        for event in events:
+            start_info = event.get("start", {})
+            end_info = event.get("end", {})
+            is_all_day = "date" in start_info and "date" in end_info
+            start = start_info.get("dateTime") or start_info.get("date")
+            end = end_info.get("dateTime") or end_info.get("date")
+            if is_all_day:
+                if all_day_policy == "omit":
+                    continue
+                hours = 8.0 if all_day_policy == "8hr" else 24.0
+                shifts.append({
+                    "title": event.get("summary", ""),
+                    "start": start,
+                    "end": end,
+                    "duration": hours,
+                    "all_day": True
+                })
+                continue
+            try:
+                start_time = parse(start)
+                end_time = parse(end)
+                if end_time <= start_time:
+                    continue
+                duration = (end_time - start_time).total_seconds() / 3600
+            except Exception:
+                continue
+            shifts.append({
+                "title": event.get("summary", ""),
+                "start": start_time,
+                "end": end_time,
+                "duration": duration,
+                "all_day": False
+                })
+        return shifts
+
+    def calculate_worked_hours(self, start_date, end_date, all_day_policy="omit") -> float:
+        shifts = self.get_shifts(start_date, end_date, all_day_policy)
+        return sum(shift["duration"] for shift in shifts)
+
+
+def get_calendar_data() -> WorkCalendar:
     """
     To test the Calendar class with user input
     """
-    return Calendar.from_input()
+    return WorkCalendar.from_input()
 
 
-def main():
-    print("------------------------------------------")
-    print("👋  Welcome to the Working Hours Analyser!")
-    print("------------------------------------------")
+class VacationCalendar(Calendar):
+    @classmethod
+    def from_input(vacationcal_class):
+        """
+        To create an instance of VacationCalendar by collecting user input
+        including an optional title filter
+        """
+        calendar = super().from_input(vacationcal_class)
+        title_filter = input("Enter a keyword or event title to filter vacation events or press Enter to skip:\n>").strip() or None
+        calendar.title_filter = title_filter
+        return calendar
+
+    def fetch_filtered_events(self, start_date, end_date):
+        """
+        To fetch the period filtered events of this instance
+        and filters them by title if requested
+        """
+        self.fetch_events_by_period(start_date, end_date)
+        return self.filter_events_by_title(self.title_filter)
+
+
+def main_testing():
+    print("-------------------------------------------")
+    print("👋 Welcome to the Working Hours Analyser!🔍")
+    print("-------------------------------------------")
     user = get_user_data()
     print("\nUser data succesfully collected:")
     print(f"Name: {user.name}")
     print(f"Name: {user.weekly_contract_hours}")
     print(f"Name: {user.country_code}")
-    calendar = get_calendar_data()
+    work_calendar = get_calendar_data()
     start = date(2025, 1, 1)
     end = date(2025, 1, 31)
-    print(f"\n📅 Fetching events between {start} and {end}...")
-    events = calendar.fetch_events_by_period(start, end)
+    print(f"\n>>>Fetching events between {start} and {end}...")
+    events = work_calendar.fetch_events_by_period(start, end)
     if not events:
-        print(f"\n⚠️ No events found between {start} and {end}.")
+        print(f"\n No events found between {start} and {end}.")
     else:
         print(f"\n Found {len(events)} event(s). Sample titles:")
         for event in events[:5]:  #just a few for testing
             print("•", event.get("summary", "No Title"))
-    keyword = input("\n🔍 Enter keyword to filter events (or leave blank):\n> ").strip()
-    filtered = calendar.filter_events_by_title(keyword)
-    print(f"\n🎯 Events after filtering ({len(filtered)}):")
+    keyword = input("\nEnter keyword to filter events (or leave blank):\n> ").strip()
+    filtered = work_calendar.filter_events_by_title(keyword)
+    print(f"\nEvents after filtering ({len(filtered)}):")
     for event in filtered:
         print("•", event.get("summary", "No Title"))
+    shifts = work_calendar.get_shifts(start, end, all_day_policy="8hr")
+    for shift in shifts:
+        print(f"{shift['title']}: {shift['start']} - {shift['end']} ({shift['duration']})\n")
+    print("\n>>> Calculating total worked hours (all-day policy = '8hr')...")
+    total_hours = work_calendar.calculate_worked_hours(start, end, all_day_policy="8hr")
+    print(f"Total worked hours: {total_hours:.2f} hrs")
 
 
-main()
-
-
+main_testing()
