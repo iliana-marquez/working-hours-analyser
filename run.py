@@ -71,7 +71,7 @@ class Calendar:
         Collects and validates the calendar ID from input
         """
         while True:
-            calendar_id = input("Please enter the ID of your work calendar (e.g., 'primary'):\n>").strip()
+            calendar_id = input("Please enter the ID of your calendar (e.g., 'primary'):\n>").strip()
             if calendar_id:
                 break
             print("Calendar ID cannot be empty. Please enter your calendar ID.\n")
@@ -123,7 +123,7 @@ class WorkCalendar(Calendar):
         as it will internally use workcal_class)
         """
         calendar = super().from_input()
-        title_filter = input("Enter a keyword or event title to filter your work events or press enter to skip:\n>").strip() or None
+        title_filter = input("\nEnter a keyword or event title to filter your work events or press enter to skip:\n>").strip() or None
         calendar.title_filter = title_filter
         return calendar
 
@@ -144,7 +144,7 @@ class WorkCalendar(Calendar):
             - "8hr": Count all-day events as 8-hour shifts
             - "24hr": Count all-day events as 24-hour shifts
         """
-        events = self.fetch_events_by_period(start_date, end_date)
+        events = self.fetch_filtered_events(start_date, end_date)
         shifts = []
         for event in events:
             start_info = event.get("start", {})
@@ -225,37 +225,41 @@ class VacationCalendar(Calendar):
 
 
 def main_testing():
-    print("-------------------------------------------")
-    print("👋 Welcome to the Working Hours Analyser!🔍")
-    print("-------------------------------------------")
-    user = get_user_data()
-    print("\nUser data succesfully collected:")
-    print(f"Name: {user.name}")
-    print(f"Name: {user.weekly_contract_hours}")
-    print(f"Name: {user.country_code}")
+    # print("-------------------------------------------")
+    # print("👋 Welcome to the Working Hours Analyser!🔍")
+    # print("-------------------------------------------")
+    # user = get_user_data()
+    # print("\nUser data succesfully collected:")
+    # print(f"Name: {user.name}")
+    # print(f"Name: {user.weekly_contract_hours}")
+    # print(f"Name: {user.country_code}")
     work_calendar = get_calendar_data()
     start = date(2025, 1, 1)
     end = date(2025, 1, 31)
     print(f"\n>>>Fetching events between {start} and {end}...")
-    events = work_calendar.fetch_events_by_period(start, end)
+    print("-------------------------------------------")
+    print("Events")
+    print("-------------------------------------------")
+    events = work_calendar.fetch_filtered_events(start, end)
     if not events:
         print(f"\n No events found between {start} and {end}.")
     else:
-        print(f"\n Found {len(events)} event(s). Sample titles:")
-        for event in events[:5]:  #just a few for testing
+        print(f"\n Found {len(events)} event(s):")
+        for event in events:  
             print("•", event.get("summary", "No Title"))
-    keyword = input("\nEnter keyword to filter events (or leave blank):\n> ").strip()
-    filtered = work_calendar.filter_events_by_title(keyword)
-    print(f"\nEvents after filtering ({len(filtered)}):")
-    for event in filtered:
-        print("•", event.get("summary", "No Title"))
+    print("\n-------------------------------------------")
+    print("Shifts")
+    print("-------------------------------------------")
     shifts = work_calendar.get_shifts(start, end, all_day_policy="8hr")
     for shift in shifts:
         print(f"{shift['title']}: {shift['start']} - {shift['end']} ({shift['duration']})\n")
     print("\n>>> Calculating total worked hours (all-day policy = '8hr')...")
+    print("-------------------------------------------")
     total_hours = work_calendar.calculate_worked_hours(start, end, all_day_policy="8hr")
     print(f"Total worked hours: {total_hours:.2f} hrs")
     total_worked_days = work_calendar.calculate_worked_days(start, end, all_day_policy="8hr")
     print(f"Total worked days: {total_worked_days}")
+    print("-------------------------------------------\n")
+
 
 main_testing()
