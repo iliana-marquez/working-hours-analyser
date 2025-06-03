@@ -182,7 +182,8 @@ class Calendar:
         within a given period of time.
         """
         try:
-            time_min = datetime.combine(start_date, time.min).isoformat() + 'Z'
+            expanded_start = start_date - timedelta(days=1)
+            time_min = datetime.combine(expanded_start, time.min).isoformat() + 'Z'
             time_max = datetime.combine(end_date, time.max).isoformat() + 'Z'
 
             events_result = CALENDAR_SERVICE.events().list(
@@ -273,7 +274,7 @@ class WorkCalendar(Calendar):
                     continue
             except Exception:
                 continue
-            if shift_end < range_start or shift_start > range_end:
+            if shift_end <= range_start or shift_start >= range_end:
                 continue
             clipped_start = max(shift_start, range_start)
             clipped_end = min(shift_end, range_end)
