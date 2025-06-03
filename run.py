@@ -23,13 +23,13 @@ CALENDAR_SERVICE = build('calendar', 'v3', credentials=SCOPE_CREDS)
 WEEKDAYS_ORDERED = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 
 WEEKDAY_ALIASES = {
-    'mo': 'mon', 'mon': 'mon',
-    'tu': 'tue', 'tue': 'tue',
-    'we': 'wed', 'wed': 'wed',
-    'th': 'thu', 'thu': 'thu',
-    'fr': 'fri', 'fri': 'fri',
-    'sa': 'sat', 'sat': 'sat',
-    'su': 'sun', 'sun': 'sun',
+    'mo': 'mon', 'mon': 'mon', 'monday': 'mon',
+    'tu': 'tue', 'tue': 'tue', 'tuesday': 'tue',
+    'we': 'wed', 'wed': 'wed', 'wednesday': 'wed',
+    'th': 'thu', 'thu': 'thu', 'thursday': 'thu',
+    'fr': 'fri', 'fri': 'fri', 'friday': 'fri',
+    'sa': 'sat', 'sat': 'sat', 'saturday': 'sat',
+    'su': 'sun', 'sun': 'sun', 'sunday': 'sun',
 }
 
 
@@ -105,7 +105,7 @@ class User:
         """
         print("\nEnter your working days (mon, tue, wed, thu, fri, sat, sun):")
         print("------------------------------------------------------------")
-        print("You can enter:")
+        print("You can enter either or both, depending on your contract:")
         print(" • A range of days (e.g. Mon-Fri or Fri-Mon)")
         print(" • A list of specific days (e.g. Mon Tue Fri)")
         print("------------------------------------------------------------")
@@ -114,24 +114,36 @@ class User:
             normalized = re.sub(r'[–—-]', '-', user_input)
             normalized = re.sub(r'\s*-\s*', '-', normalized)
             entries = normalized.split()
+            all_valid = True
             selected_days = []
             for entry in entries:
                 if '-' in entry:
                     parts = entry.split('-')
-                    if len(parts) == 2:
-                        start = WEEKDAY_ALIASES.get(parts[0][:2])
-                        end = WEEKDAY_ALIASES.get(parts[1][:2])
-                        if start and end:
-                            start_index = WEEKDAYS_ORDERED.index(start)
-                            end_index = WEEKDAYS_ORDERED.index(end)
-                            if start_index <= end_index:
-                                selected_days.extend(WEEKDAYS_ORDERED[start_index:end_index + 1])
-                            else:
-                                selected_days.extend(WEEKDAYS_ORDERED[start_index:] + WEEKDAYS_ORDERED[:end_index + 1])
+                    if len(parts) != 2:
+                        all_valid = False
+                        break
+                    start = WEEKDAY_ALIASES.get(parts[0][:2])
+                    end = WEEKDAY_ALIASES.get(parts[1][:2])
+                    if not start or not end:
+                        all_valid = False
+                        break
+                    start_index = WEEKDAYS_ORDERED.index(start)
+                    end_index = WEEKDAYS_ORDERED.index(end)
+                    if start_index <= end_index:
+                        selected_days.extend(WEEKDAYS_ORDERED[start_index:end_index + 1])
+                    else:
+                        selected_days.extend(WEEKDAYS_ORDERED[start_index:] + WEEKDAYS_ORDERED[:end_index + 1])
                 else:
-                    day = WEEKDAY_ALIASES.get(entry[:2])
-                    if day:
-                        selected_days.append(day)
+                    day = WEEKDAY_ALIASES.get(entry)
+                    if not day:
+                        all_valid = False
+                        break
+                    selected_days.append(day)
+
+            if not all_valid:
+                print("Invalid day or range detected. Please use correct day names or ranges (e.g., 'mon', 'wed-fri'). Try again.")
+                continue
+
             seen = set()
             unique_days = [d for d in WEEKDAYS_ORDERED if d in selected_days and not (d in seen or seen.add(d))]
             if unique_days:
