@@ -333,7 +333,7 @@ class VacationCalendar(Calendar):
         self.fetch_events_by_period(start_date, end_date)
         return self.filter_events_by_title(self.title_filter)
 
-    def calculate_vacation_days(self, start_date: date, end_date: date) -> int:
+    def get_vacation_days(self, start_date: date, end_date: date) -> set:
         """
         To calculate the number of vacation days between start_date and end_date,
         from filtered events, clipping any multi-day events to stay within bounds.
@@ -360,6 +360,10 @@ class VacationCalendar(Calendar):
                         vacation_days.add(day)
             except Exception as e:
                 print(f"Skipping event due to error: {e}")
+        return vacation_days
+
+    def calculate_vacation_days(self, start_date: date, end_date: date) -> int:
+        vacation_days = self.get_vacation_days(start_date, end_date)
         return len(vacation_days)
 
 
@@ -404,17 +408,30 @@ def get_holiday_calendar(country_code) -> HolidayCalendar:
 
 
 class Report:
-    def __init__(self, user, work_calendar, vacation_calendar, holiday_calendar, start_date, end_date):
+    def __init__(
+            self,
+            user: 'User',
+            work_calendar: 'WorkCalendar',
+            vacation_calendar: 'VacationCalendar',
+            holiday_calendar: 'HolidayCalendar',
+            start_date: date,
+            end_date: date,
+            all_day_policy: str = "omit"
+    ):
         self.user = user
         self.work_calendar = work_calendar
         self.vacation_calendar = vacation_calendar
-        self.holiday.calendar = holiday_calendar
+        self.holiday_calendar = holiday_calendar
         self.start_date = start_date
         self.end_date = end_date
         self.expected_working_days = 0
         self.expected_working_hours = 0
         self.actual_working_days = 0
         self.actual_working_hours = 0
+        self.all_day_policy = all_day_policy
+        self.work_calendar.fetch_filtered_events(start_date, end_date)
+        self.vacation_calendar.fetch_filtered_events(start_date, end_date)
+        self.holiday_calendar.fetch_holidays(start_date, end_date)
     
     def calculate_expected(self):
         current = self.start_date
@@ -422,25 +439,25 @@ class Report:
                 
 
 
-def user_calendar_testing():
-    print("-------------------------------------------")
-    print("👋 Welcome to the Working Hours Analyser!🔍")
-    print("-------------------------------------------")
-    user = get_user_data()
-    print(f"Country Code: {user.country_code}")
-    print(f"Weekly Hours: {user.weekly_contract_hours}")
-    print(f"Working Week: {user.contract_working_weekdays}")
-    print(f"Working Name: {user.name}")
-    # start = date(2025, 1, 1)
-    # end = date(2025, 1, 31)
-    # holiday_calendar = get_holiday_calendar(user.country_code)
-    # holidays = holiday_calendar.fetch_holidays(start, end)
-    # print(holidays)
-    # total_holidays = holiday_calendar.count_holidays()
-    # print(total_holidays)
+# def user_calendar_testing():
+#     print("-------------------------------------------")
+#     print("👋 Welcome to the Working Hours Analyser!🔍")
+#     print("-------------------------------------------")
+#     user = get_user_data()
+#     print(f"Country Code: {user.country_code}")
+#     print(f"Weekly Hours: {user.weekly_contract_hours}")
+#     print(f"Working Week: {user.contract_working_weekdays}")
+#     print(f"Working Name: {user.name}")
+#     # start = date(2025, 1, 1)
+#     # end = date(2025, 1, 31)
+#     # holiday_calendar = get_holiday_calendar(user.country_code)
+#     # holidays = holiday_calendar.fetch_holidays(start, end)
+#     # print(holidays)
+#     # total_holidays = holiday_calendar.count_holidays()
+#     # print(total_holidays)
 
 
-user_calendar_testing()
+# user_calendar_testing()
 
 
 # def main_testing():
