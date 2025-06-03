@@ -227,6 +227,8 @@ class VacationCalendar(Calendar):
         """
         To calculate the number of vacation days between start_date and end_date,
         from filtered events, clipping any multi-day events to stay within bounds.
+        clipped_start = max(date_start, start_date) - clip up to start_date if event starts earlier
+        clipped_end = min(date_end, end_date) - clip down to end_date if event ends later
         """
         vacation_events = self.fetch_filtered_events(start_date, end_date)
         vacation_days = set()
