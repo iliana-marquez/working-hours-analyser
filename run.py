@@ -68,7 +68,7 @@ class User:
         return user_class(name, country_code, weekly_contract_hours, contract_working_weekdays)
     
     @staticmethod
-    def get_contract_working_weekdays() -> List[str]:
+    def get_contract_working_weekdays() -> List[int]:
         """
         To collect the user's specific contract working weekdays
         """
@@ -83,13 +83,13 @@ class User:
         while True:
             choice = input("Type the selected option number:\n> ").strip()
             if choice == '1':
-                return WEEKDAYS_ORDERED[:5] 
+                return list(range(0, 5)) 
             elif choice == '2':
-                return WEEKDAYS_ORDERED[:6]
+                return list(range(0, 6))
             elif choice == '3':
-                return WEEKDAYS_ORDERED[:4]
+                return list(range(0, 4))
             elif choice == '4':
-                return WEEKDAYS_ORDERED
+                return list(range(0, 7))
             elif choice == '5':
                 return User._custom_working_weekdays_input()
             else:
@@ -111,7 +111,8 @@ class User:
         print("------------------------------------------------------------")
         while True:
             user_input = input("> ").lower().strip()
-            normalized = re.sub(r'[–—-]', '-', user_input)
+            normalized = user_input.replace(',', ' ')
+            normalized = re.sub(r'[–—-]', '-', normalized)
             normalized = re.sub(r'\s*-\s*', '-', normalized)
             entries = normalized.split()
             all_valid = True
@@ -122,30 +123,32 @@ class User:
                     if len(parts) != 2:
                         all_valid = False
                         break
-                    start = WEEKDAY_ALIASES.get(parts[0][:2])
-                    end = WEEKDAY_ALIASES.get(parts[1][:2])
+                    start = WEEKDAY_ALIASES.get(parts[0])
+                    end = WEEKDAY_ALIASES.get(parts[1])
                     if not start or not end:
                         all_valid = False
                         break
                     start_index = WEEKDAYS_ORDERED.index(start)
                     end_index = WEEKDAYS_ORDERED.index(end)
                     if start_index <= end_index:
-                        selected_days.extend(WEEKDAYS_ORDERED[start_index:end_index + 1])
+                        selected_days.extend(range(start_index, end_index + 1))
                     else:
-                        selected_days.extend(WEEKDAYS_ORDERED[start_index:] + WEEKDAYS_ORDERED[:end_index + 1])
+                        selected_days.extend(list(range(start_index, 7)) + list(range(0, end_index + 1)))
                 else:
-                    day = WEEKDAY_ALIASES.get(entry)
+                    entry_clean = entry.lower().strip()
+                    day = WEEKDAY_ALIASES.get(entry_clean)
                     if not day:
                         all_valid = False
                         break
-                    selected_days.append(day)
+                    day_index = WEEKDAYS_ORDERED.index(day)
+                    selected_days.append(day_index)
 
             if not all_valid:
                 print("Invalid day or range detected. Please use correct day names or ranges (e.g., 'mon', 'wed-fri'). Try again.")
                 continue
 
             seen = set()
-            unique_days = [d for d in WEEKDAYS_ORDERED if d in selected_days and not (d in seen or seen.add(d))]
+            unique_days = [d for d in range(7) if d in selected_days and not (d in seen or seen.add(d))]
             if unique_days:
                 return unique_days
             print("Invalid format. Try again using day names (e.g ''Mon Wed Fri') and/or ranges (e.g Wed-Fri)")
@@ -400,78 +403,99 @@ def get_holiday_calendar(country_code) -> HolidayCalendar:
     return HolidayCalendar(country_code)
 
 
-# def user_calendar_testing():
-#     print("-------------------------------------------")
-#     print("👋 Welcome to the Working Hours Analyser!🔍")
-#     print("-------------------------------------------")
-#     user = get_user_data()
-#     print(f"Country Code: {user.country_code}")
-#     print(f"Working Week: {user.contract_working_weekdays}")
-#     start = date(2025, 1, 1)
-#     end = date(2025, 1, 31)
-#     holiday_calendar = get_holiday_calendar(user.country_code)
-#     holidays = holiday_calendar.fetch_holidays(start, end)
-#     print(holidays)
-#     total_holidays = holiday_calendar.count_holidays()
-#     print(total_holidays)
+class Report:
+    def __init__(self, user, work_calendar, vacation_calendar, holiday_calendar, start_date, end_date):
+        self.user = user
+        self.work_calendar = work_calendar
+        self.vacation_calendar = vacation_calendar
+        self.holiday.calendar = holiday_calendar
+        self.start_date = start_date
+        self.end_date = end_date
+        self.expected_working_days = 0
+        self.expected_working_hours = 0
+        self.actual_working_days = 0
+        self.actual_working_hours = 0
+    
+    def calculate_expected(self):
+        current = self.start_date
+        contract_days = self.user.contract_working_days
+                
 
 
-# user_calendar_testing()
-
-
-def main_testing():
+def user_calendar_testing():
     print("-------------------------------------------")
     print("👋 Welcome to the Working Hours Analyser!🔍")
     print("-------------------------------------------")
     user = get_user_data()
-    print("\nUser data succesfully collected:")
-    print(f"Name: {user.name}")
-    print(f"Week Hours: {user.weekly_contract_hours}")
     print(f"Country Code: {user.country_code}")
-    work_calendar = get_calendar_data()
-    start = date(2025, 1, 1)
-    end = date(2025, 1, 31)
-    print(f"\n>>>Fetching events between {start} and {end}...")
-    print("-------------------------------------------")
-    print("Events")
-    print("-------------------------------------------")
-    events = work_calendar.fetch_filtered_events(start, end)
-    if not events:
-        print(f"\n No events found between {start} and {end}.")
-    else:
-        print(f"\n Found {len(events)} event(s):")
-        for event in events:
-            print("•", event.get("summary", "No Title"))
-    print("\n-------------------------------------------")
-    print("Shifts")
-    print("-------------------------------------------")
-    shifts = work_calendar.get_shifts(start, end, all_day_policy="8hr")
-    for shift in shifts:
-        print(f"{shift['title']}: {shift['start']} - {shift['end']} ({shift['duration']})\n")
-    print("\n>>> Calculating total worked hours (all-day policy = '8hr')...")
-    print("-------------------------------------------")
-    total_hours = work_calendar.calculate_worked_hours(start, end, all_day_policy="8hr")
-    print(f"Total worked hours: {total_hours:.2f} hrs")
-    total_worked_days = work_calendar.calculate_worked_days(start, end, all_day_policy="8hr")
-    print(f"Total worked days: {total_worked_days}")
-    print("-------------------------------------------\n")
-    # vacation_calendar = get_vacation_calendar()
-    # vacations = vacation_calendar.fetch_filtered_events(start, end)
-    # print(f"\n>>>Fetching vacations between {start} and {end}...")
-    # print("-------------------------------------------")
-    # print("Vacation Events")
-    # print("-------------------------------------------")
-    # if not vacations:
-    #     print(f"\n No events found between {start} and {end}.")
-    # else:
-    #     print(f"\n Found {len(vacations)} event(s):")
-    #     for vacation in vacations:
-    #         print("•", vacation.get("summary", "No Title"))
-    # print("\n>>>Calculating your vacations days...")
-    # print("\n-------------------------------------------")
-    # vacations_days = vacation_calendar.calculate_vacation_days(start, end)
-    # print(f"Total Vacations Days: {vacations_days}")
-    # print("-------------------------------------------")
+    print(f"Weekly Hours: {user.weekly_contract_hours}")
+    print(f"Working Week: {user.contract_working_weekdays}")
+    print(f"Working Name: {user.name}")
+    # start = date(2025, 1, 1)
+    # end = date(2025, 1, 31)
+    # holiday_calendar = get_holiday_calendar(user.country_code)
+    # holidays = holiday_calendar.fetch_holidays(start, end)
+    # print(holidays)
+    # total_holidays = holiday_calendar.count_holidays()
+    # print(total_holidays)
 
 
-main_testing()
+user_calendar_testing()
+
+
+# def main_testing():
+#     print("-------------------------------------------")
+#     print("👋 Welcome to the Working Hours Analyser!🔍")
+#     print("-------------------------------------------")
+#     user = get_user_data()
+#     print("\nUser data succesfully collected:")
+#     print(f"Name: {user.name}")
+#     print(f"Week Hours: {user.weekly_contract_hours}")
+#     print(f"Country Code: {user.country_code}")
+#     work_calendar = get_calendar_data()
+#     start = date(2025, 1, 1)
+#     end = date(2025, 1, 31)
+#     print(f"\n>>>Fetching events between {start} and {end}...")
+#     print("-------------------------------------------")
+#     print("Events")
+#     print("-------------------------------------------")
+#     events = work_calendar.fetch_filtered_events(start, end)
+#     if not events:
+#         print(f"\n No events found between {start} and {end}.")
+#     else:
+#         print(f"\n Found {len(events)} event(s):")
+#         for event in events:
+#             print("•", event.get("summary", "No Title"))
+#     print("\n-------------------------------------------")
+#     print("Shifts")
+#     print("-------------------------------------------")
+#     shifts = work_calendar.get_shifts(start, end, all_day_policy="8hr")
+#     for shift in shifts:
+#         print(f"{shift['title']}: {shift['start']} - {shift['end']} ({shift['duration']})\n")
+#     print("\n>>> Calculating total worked hours (all-day policy = '8hr')...")
+#     print("-------------------------------------------")
+#     total_hours = work_calendar.calculate_worked_hours(start, end, all_day_policy="8hr")
+#     print(f"Total worked hours: {total_hours:.2f} hrs")
+#     total_worked_days = work_calendar.calculate_worked_days(start, end, all_day_policy="8hr")
+#     print(f"Total worked days: {total_worked_days}")
+#     print("-------------------------------------------\n")
+#     # vacation_calendar = get_vacation_calendar()
+#     # vacations = vacation_calendar.fetch_filtered_events(start, end)
+#     # print(f"\n>>>Fetching vacations between {start} and {end}...")
+#     # print("-------------------------------------------")
+#     # print("Vacation Events")
+#     # print("-------------------------------------------")
+#     # if not vacations:
+#     #     print(f"\n No events found between {start} and {end}.")
+#     # else:
+#     #     print(f"\n Found {len(vacations)} event(s):")
+#     #     for vacation in vacations:
+#     #         print("•", vacation.get("summary", "No Title"))
+#     # print("\n>>>Calculating your vacations days...")
+#     # print("\n-------------------------------------------")
+#     # vacations_days = vacation_calendar.calculate_vacation_days(start, end)
+#     # print(f"Total Vacations Days: {vacations_days}")
+#     # print("-------------------------------------------")
+
+
+# main_testing()
