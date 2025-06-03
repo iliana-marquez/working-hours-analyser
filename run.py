@@ -4,7 +4,7 @@ from googleapiclient.discovery import build
 import holidays
 from datetime import datetime, date, timedelta, time
 from dateutil.parser import parse
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Set
 import re
 
 SCOPE = [
@@ -424,18 +424,30 @@ class Report:
         self.holiday_calendar = holiday_calendar
         self.start_date = start_date
         self.end_date = end_date
-        self.expected_working_days = 0
-        self.expected_working_hours = 0
-        self.actual_working_days = 0
-        self.actual_working_hours = 0
         self.all_day_policy = all_day_policy
+        # Fetch events and holidays once for the period
         self.work_calendar.fetch_filtered_events(start_date, end_date)
         self.vacation_calendar.fetch_filtered_events(start_date, end_date)
         self.holiday_calendar.fetch_holidays(start_date, end_date)
-    
-    def calculate_expected(self):
-        current = self.start_date
-        contract_days = self.user.contract_working_days
+        # Pre-calc sets for easy overlap checks
+        self.vacation_days: Set[date] = self.vacation_calendar.get_vacation_days(start_date, end_date)
+        self.holiday_days: Set[date] = {h['date'] for h in self.holiday_calendar.holidays}
+
+    def calculate_expected_working_days(self) -> int:
+        """
+        To calculate expected working days excluding vacations and holidays
+        without extracting twice if a holiday overlaps a vacation day
+        Only days in the user's contract working weekdays are counted.
+        """
+        all_days = (self.end_date - self.start_date).days + 1
+        expected_days = 0
+        for i in range(all_days):
+            current_day = self.start_date + timedelta(days=i)
+            weekday = current_day.weekday()
+            if weekday in self.user.contract_working_weekdays:
+                if current_day not in self.holiday_days and current_day not in self.vacation_days:
+                    expected_days += 1
+        return expected_days
                 
 
 
