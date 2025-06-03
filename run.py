@@ -4,7 +4,8 @@ from googleapiclient.discovery import build
 import holidays
 from datetime import datetime, date, timedelta, time
 from dateutil.parser import parse
-from typing import Optional, List, Tuple, Dict
+from typing import Optional, List, Dict
+import re
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -19,12 +20,25 @@ GSPREAD_CLIENT = gspread.authorize(SCOPE_CREDS)
 SHEET = GSPREAD_CLIENT.open('working-hours-reports')
 CALENDAR_SERVICE = build('calendar', 'v3', credentials=SCOPE_CREDS)
 
+WEEKDAYS_ORDERED = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+
+WEEKDAY_ALIASES = {
+    'mo': 'mon', 'mon': 'mon',
+    'tu': 'tue', 'tue': 'tue',
+    'we': 'wed', 'wed': 'wed',
+    'th': 'thu', 'thu': 'thu',
+    'fr': 'fri', 'fri': 'fri',
+    'sa': 'sat', 'sat': 'sat',
+    'su': 'sun', 'sun': 'sun',
+}
+
 
 class User:
-    def __init__(self, name: str, weekly_contract_hours: float, country_code: str):
+    def __init__(self, name: str, country_code: str,  weekly_contract_hours: float, contract_working_weekdays: List[str]):
         self.name = name
-        self.weekly_contract_hours = weekly_contract_hours
         self.country_code = country_code.upper()
+        self.weekly_contract_hours = weekly_contract_hours
+        self.contract_working_weekdays = contract_working_weekdays
 
     @classmethod
     def from_input(user_class):
@@ -32,24 +46,97 @@ class User:
         Gathers and validates the user information from inputs
         """
         while True:
-            name = input("What is your name?\n>").strip()
+            name = input("What is your name?\n> ").strip()
             if name:
                 break
-            print("Please type your name:\n>")
-        while True:
-            hours_input = input("What are your weekly contract hours (e.g., 26.5)?\n> ")
-            try:
-                weekly_contract_hours = float(hours_input)
-                break
-            except ValueError:
-                print("Please enter a valid number (e.g., 26.5) for calculations:\n> ")
+            print("Please type your name.")
         while True:
             country_code = input("Please enter your country's two-letter code (e.g., 'AT' for Austria):\n> ").strip()
             if len(country_code) == 2 and country_code.isalpha():
                 break
-            print("Your country code must be exactly two letters, please try again:\n> ")
+            print("Your country code must be exactly two letters, please try again.")
+        while True:
+            hours_input = input("What are your weekly contract hours (e.g., 26.5)?\n> ").strip()
+            try:
+                weekly_contract_hours = float(hours_input)
+                break
+            except ValueError:
+                print("Please enter a valid number (e.g., 26.5) for calculations.")
 
-        return user_class(name, weekly_contract_hours, country_code)
+        contract_working_weekdays =  user_class.get_contract_working_weekdays()
+
+        return user_class(name, country_code, weekly_contract_hours, contract_working_weekdays)
+    
+    @staticmethod
+    def get_contract_working_weekdays() -> List[str]:
+        """
+        To collect the user's specific contract working weekdays
+        """
+        print("\nWhat is your standard working week?")
+        print("-------------------------------------------")
+        print("1. Mon-Fri")
+        print("2. Mon-Sat")
+        print("3. Mon-Thu")
+        print("4. Flexible (Every day)")
+        print("5. Custom (Other specific days or range)")
+        print("-------------------------------------------")
+        while True:
+            choice = input("Type the selected option number:\n> ").strip()
+            if choice == '1':
+                return WEEKDAYS_ORDERED[:5] 
+            elif choice == '2':
+                return WEEKDAYS_ORDERED[:6]
+            elif choice == '3':
+                return WEEKDAYS_ORDERED[:4]
+            elif choice == '4':
+                return WEEKDAYS_ORDERED
+            elif choice == '5':
+                return User._custom_working_weekdays_input()
+            else:
+                print("Please choose a valid option from 1 to 5).")
+
+    @staticmethod
+    def _custom_working_weekdays_input() -> List[str]:
+        """
+        To transform the custom input into clean and valid output for
+        get_contract_working_weekdays():
+        - Mixed input: Ranges and individual days (e.g. mon-th sa or mo - we sun)
+        - Orders by weekday
+        """
+        print("\nEnter your working days (mon, tue, wed, thu, fri, sat, sun):")
+        print("------------------------------------------------------------")
+        print("You can enter:")
+        print(" • A range of days (e.g. Mon-Fri or Fri-Mon)")
+        print(" • A list of specific days (e.g. Mon Tue Fri)")
+        print("------------------------------------------------------------")
+        while True:
+            user_input = input("> ").lower().strip()
+            normalized = re.sub(r'[–—-]', '-', user_input)
+            normalized = re.sub(r'\s*-\s*', '-', normalized)
+            entries = normalized.split()
+            selected_days = []
+            for entry in entries:
+                if '-' in entry:
+                    parts = entry.split('-')
+                    if len(parts) == 2:
+                        start = WEEKDAY_ALIASES.get(parts[0][:2])
+                        end = WEEKDAY_ALIASES.get(parts[1][:2])
+                        if start and end:
+                            start_index = WEEKDAYS_ORDERED.index(start)
+                            end_index = WEEKDAYS_ORDERED.index(end)
+                            if start_index <= end_index:
+                                selected_days.extend(WEEKDAYS_ORDERED[start_index:end_index + 1])
+                            else:
+                                selected_days.extend(WEEKDAYS_ORDERED[start_index:] + WEEKDAYS_ORDERED[:end_index + 1])
+                else:
+                    day = WEEKDAY_ALIASES.get(entry[:2])
+                    if day:
+                        selected_days.append(day)
+            seen = set()
+            unique_days = [d for d in WEEKDAYS_ORDERED if d in selected_days and not (d in seen or seen.add(d))]
+            if unique_days:
+                return unique_days
+            print("Invalid format. Try again using day names (e.g ''Mon Wed Fri') and/or ranges (e.g Wed-Fri)")
 
 
 def get_user_data() -> User:
@@ -255,7 +342,7 @@ class VacationCalendar(Calendar):
 
 def get_vacation_calendar() -> VacationCalendar:
     """
-    To test the Calendar class with user input
+    To test the VacationCalendar class
     """
     return VacationCalendar.from_input()
 
@@ -288,7 +375,7 @@ class HolidayCalendar:
 
 def get_holiday_calendar(country_code) -> HolidayCalendar:
     """
-    To test the Calendar class with user input
+    To test the holidaycalendar class with user input
     """
     return HolidayCalendar(country_code)
 
@@ -299,6 +386,7 @@ def user_calendar_testing():
     print("-------------------------------------------")
     user = get_user_data()
     print(f"Country Code: {user.country_code}")
+    print(f"Working Week: {user.contract_working_weekdays}")
     start = date(2025, 1, 1)
     end = date(2025, 1, 31)
     holiday_calendar = get_holiday_calendar(user.country_code)
