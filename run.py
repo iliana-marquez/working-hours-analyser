@@ -546,18 +546,35 @@ class Report:
         print(f"Actual worked hours: {actual_hours}")
         print(f"Difference: {difference} ({diff_label})")
 
+"""
+Helper and flow methods
+"""
+def print_banner():
+    print("---------------------------------------------------")
+    print("👋 Welcome to Working Hours Analyser 🔍")
+    print("---------------------------------------------------")
+    print("📆 No more spreadsheets — track time effortlessly!\n")
+    print("⏱️  This tool connects to your Google Calendar and automatically")
+    print("calculates actual vs. expected hours, time balance,")
+    print("vacations, holidays and gives you a clean shift summary.\n")
+    print("🔧 All you'll need:")
+    print("Calendar ID(s), contract hours & a date range.\n")
+    print("Don't worry - the setup is fully guided and takes less than a minute.")
+    print("---------------------------------------------------")
+    print("Let's get your time tracking sorted 👍")
+    print("---------------------------------------------------")
+
+
 
 def report_testing():
-    print("-------------------------------------------")
-    print("👋 Welcome to the Working Hours Analyser!🔍")
-    print("-------------------------------------------")
+    print_banner()
     user = get_user_data()
     print("\nUser data succesfully collected:")
     print(f"Name: {user.name}")
     print(f"Week Hours: {user.weekly_contract_hours}")
     print(f"Country Code: {user.country_code}")
     start = date(2025, 1, 1)
-    end = date(2025, 1, 31)
+    end = date(2025, 5, 31)
     all_day_policy = "omit"
     work_calendar = get_calendar_data()
     vacation_calendar = get_vacation_calendar()
