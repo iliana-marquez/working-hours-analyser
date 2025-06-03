@@ -501,9 +501,21 @@ class Report:
         To return the actual worked hours in the period using the calendar.
         """
         return self.work_calendar.calculate_worked_hours(self.start_date, self.end_date, self.all_day_policy)
+    
+    def calculate_expected_working_hours(self) -> float:
+        """
+        To calculate expected working hours based on the user's weekly hours and
+        the number of expected working days in the period.
+        """
+        total_working_days = self.calculate_expected_working_days()
+        # Number of weekdays in contract (e.g., Mon–Fri = 5)
+        working_days_per_week = len(self.user.contract_working_weekdays)
+        # Hours per day = total weekly hours divided by number of working days
+        hours_per_day = self.user.weekly_contract_hours / working_days_per_week
+        return round(total_working_days * hours_per_day, 2)
 
     def print_summary(self):
-        print("\n-----------------------------------------------------")
+        print("-----------------------------------------------------")
         print(f"Reporting from {self.start_date} to {self.end_date}")
         print("-----------------------------------------------------")
         print(f"Name: {self.user.name}")
@@ -518,7 +530,21 @@ class Report:
         print(f"Holiday days count: {self.calculate_holiday_days_count()}")
         print(f"Total days off: {self.calculate_total_days_off()}")
         print(f"Actual worked days: {self.calculate_actual_working_days()}")
-        print(f"Actual worked hours: {self.calculate_actual_working_hours()}")
+        
+        expected_hours = self.calculate_expected_working_hours()
+        actual_hours = self.calculate_actual_working_hours()
+        difference = round(actual_hours - expected_hours, 2)
+        
+        if difference > 0:
+            diff_label = f"{abs(difference)} hours above expected"
+        elif difference < 0:
+            diff_label = f"{abs(difference)} hours below expected"
+        else:
+            diff_label = "exactly on target"
+        
+        print(f"Expected working hours: {expected_hours}")
+        print(f"Actual worked hours: {actual_hours}")
+        print(f"Difference: {difference} ({diff_label})")
 
 
 def report_testing():
