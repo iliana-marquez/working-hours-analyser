@@ -532,6 +532,7 @@ class Report:
         self.work_calendar.fetch_filtered_events(start_date, end_date)
         self.vacation_calendar.fetch_filtered_events(start_date, end_date)
         self.holiday_calendar.fetch_holidays(start_date, end_date)
+        self.shifts = self.work_calendar.get_shifts(start_date, end_date, all_day_policy)
         # Get sets of vacation and holiday days
         self.vacation_days: Set[date] = self.vacation_calendar.get_vacation_days(start_date, end_date)
         self.holiday_days: Set[date] = {h['date'] for h in self.holiday_calendar.holidays}
@@ -605,36 +606,68 @@ class Report:
         return round(total_working_days * hours_per_day, 2)
 
     def print_summary(self):
-        print("-----------------------------------------------------")
-        print(f"Reporting from {self.start_date} to {self.end_date}")
-        print("-----------------------------------------------------")
-        print(f"Name: {self.user.name}")
-        print(f"User contract weekdays: {self.user.contract_working_weekdays}")
-        print(f"Vacation days (raw): {sorted(self.vacation_days)}")
-        print(f"Holiday days (raw): {sorted(self.holiday_days)}")
-        print(f"Overlapping days: {sorted(self.overlapping_days)}")
-        print(f"Adjusted vacation days: {sorted(self.adjusted_vacation_days)}")
-        print(f"Adjusted holiday days: {sorted(self.adjusted_holiday_days)}")
-        print(f"Expected working days: {self.calculate_expected_working_days()}")
-        print(f"Vacation days count: {self.calculate_vacation_days_count()}")
-        print(f"Holiday days count: {self.calculate_holiday_days_count()}")
-        print(f"Total days off: {self.calculate_total_days_off()}")
-        print(f"Actual worked days: {self.calculate_actual_working_days()}")
+        """
+        to print the hour_report by default
+        and ask user if a days or shifts report is also wanted
+        """
+        self.print_hours_report()
+        show_days_report = input("\nDo you want to see your amount of worked & vacation days? (yes/no)\n> ").strip().lower()
+        if show_days_report in ("yes", "y"):
+            self.print_days_report()
+        show_shifts_report = input("\nDo you want to see a detailed list of your shifts for this period? (yes/no)\n> ").strip().lower()
+        if show_shifts_report in ("yes", "y"):
+            self.print_shifts_report()
+    
+    def print_hours_report(self):
+        print("\n---------------------------------------------------")
+        print(f"Your Working Hours Report: {self.start_date.strftime('%B %Y')}")
+        print("---------------------------------------------------")
+        print(f"👤 Name: {self.user.name}\n")
+        print(f"📊 Report Period: {self.start_date.strftime('%d.%m.%Y')} - {self.end_date.strftime('%d.%m.%Y')}\n")
         
-        expected_hours = self.calculate_expected_working_hours()
-        actual_hours = self.calculate_actual_working_hours()
+        expected_hours = round(self.calculate_expected_working_hours(), 2)
+        actual_hours = round(self.calculate_actual_working_hours(), 2)
         difference = round(actual_hours - expected_hours, 2)
-        
+
         if difference > 0:
-            diff_label = f"{abs(difference)} hours above expected"
+            diff_label = f"⬆️ {abs(difference)} hours above expected"
         elif difference < 0:
-            diff_label = f"{abs(difference)} hours below expected"
+            diff_label = f"⬇️ {abs(difference)} hours below expected"
         else:
-            diff_label = "exactly on target"
-        
-        print(f"Expected working hours: {expected_hours}")
-        print(f"Actual worked hours: {actual_hours}")
-        print(f"Difference: {difference} ({diff_label})")
+            diff_label = "🎯 exactly on target"
+
+        print(f"⏱️ Expected working hours (based on contract): {expected_hours} hours\n")
+        print(f"✅ Actual worked hours (from Google Calendar): {actual_hours} hours\n")
+        print(f"Difference: {abs(difference)} hours ({diff_label})")
+        print("---------------------------------------------------")
+    
+    def print_days_report(self):
+        print("\n>>> Getting your Days Report…\n")
+        print("---------------------------------------------------")
+        print(f"Your Days Report: {self.start_date.strftime('%B %Y')}")
+        print("---------------------------------------------------")
+        print(f"👤 Name: {self.user.name}\n")
+        print(f"📊 Report Period: {self.start_date.strftime('%d.%m.%Y')} - {self.end_date.strftime('%d.%m.%Y')}\n")
+        print(f"📅 Expected working days: {self.calculate_expected_working_days()}\n")
+        print(f"✅ Working days: {self.calculate_actual_working_days()}\n")
+        print(f"🏖️ Vacation days: {self.calculate_vacation_days_count()}")
+        print("---------------------------------------------------")
+
+    def print_shifts_report(self):
+        print("\n>>> Getting your Shifts Report…\n")
+        print("---------------------------------------------------")
+        print(f"Your Shifts Report: {self.start_date.strftime('%B %Y')}")
+        print("---------------------------------------------------")
+        print(f"👤 Name: {self.user.name}\n")
+        print(f"📊 Report Period: {self.start_date.strftime('%d.%m.%Y')} - {self.end_date.strftime('%d.%m.%Y')}\n")
+
+        for shift in self.shifts:
+            date_str = shift["start"].strftime("%d.%m.%Y")
+            time_range = f" {shift['start'].strftime('%H:%M')} - {shift['end'].strftime('%H:%M')}"
+            duration = round(shift["duration"], 1)
+            print(f"👉 {date_str} {time_range}: {shift['title']} ({duration} hrs)")
+        print("---------------------------------------------------")
+
 
 """
 Helper and flow methods
@@ -697,27 +730,29 @@ def report_testing():
     work_calendar = get_calendar_data()
     vacation_calendar = get_vacation_calendar()
     holiday_calendar = get_holiday_calendar(user.country_code)
+    print("\nProcessing your request... ⌛ This may take a moment as we fetch events.")
+    print(f"🧠 Analyzing data for {user.name.capitalize()} from {start.strftime('%d.%m.%Y')} to {end.strftime('%d.%m.%Y')} (excluding public holidays and vacation events)...")
     report = Report(user, work_calendar, vacation_calendar, holiday_calendar, start, end, all_day_policy)
     report.print_summary()
-    print("lets check if calculations were correct with the data given:")
-    print(f"user' working: week{user.contract_working_weekdays}")
-    print(f"\n>>>Fetching events between {start} and {end}...")
-    print("-------------------------------------------")
-    print("Events")
-    print("-------------------------------------------")
-    events = work_calendar.fetch_filtered_events(start, end)
-    if not events:
-        print(f"\n No events found between {start} and {end}.")
-    else:
-        print(f"\n Found {len(events)} event(s):")
-        for event in events:
-            print("•", event.get("summary", "No Title"))
-    print("\n-------------------------------------------")
-    print("Shifts")
-    print("-------------------------------------------")
-    shifts = work_calendar.get_shifts(start, end, all_day_policy="8hr")
-    for shift in shifts:
-        print(f"{shift['title']}: {shift['start']} - {shift['end']} ({shift['duration']})\n")
+    # print("lets check if calculations were correct with the data given:")
+    # print(f"user' working: week{user.contract_working_weekdays}")
+    # print(f"\n>>>Fetching events between {start} and {end}...")
+    # print("-------------------------------------------")
+    # print("Events")
+    # print("-------------------------------------------")
+    # events = work_calendar.fetch_filtered_events(start, end)
+    # if not events:
+    #     print(f"\n No events found between {start} and {end}.")
+    # else:
+    #     print(f"\n Found {len(events)} event(s):")
+    #     for event in events:
+    #         print("•", event.get("summary", "No Title"))
+    # print("\n-------------------------------------------")
+    # print("Shifts")
+    # print("-------------------------------------------")
+    # shifts = work_calendar.get_shifts(start, end, all_day_policy="8hr")
+    # for shift in shifts:
+    #     print(f"{shift['title']}: {shift['start']} - {shift['end']} ({shift['duration']})\n")
 
 
 report_testing()
