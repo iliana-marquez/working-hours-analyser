@@ -5,6 +5,9 @@
 This application was developed as a personal solution to gain clear and accurate tracking of my working hours, particularly because I work with flexible schedules and freelance projects. Existing tools either lack smooth integration with Google Calendar or require cumbersome manual entry in spreadsheets. This tool bridges that gap by automatically connecting to your Google Calendar, calculating your actual hours worked versus contract hours, tracking vacation and holiday days, and providing detailed reports — all tailored to flexible work patterns.
 
 ![alt text](image.png)
+
+visit live:
+https://working-hours-analyser-1a0bd1b9ba29.herokuapp.com/
 ---
 
 ## Features
