@@ -630,15 +630,15 @@ class Report:
         difference = round(actual_hours - expected_hours, 2)
 
         if difference > 0:
-            diff_label = f"⬆️ {abs(difference)} hours above expected"
+            diff_label = f"{abs(difference)} ⬆️ hours above expected"
         elif difference < 0:
-            diff_label = f"⬇️ {abs(difference)} hours below expected"
+            diff_label = f"{abs(difference)} ⬇️ hours below expected"
         else:
             diff_label = "🎯 exactly on target"
 
         print(f"⏱️ Expected working hours (based on contract): {expected_hours} hours\n")
         print(f"✅ Actual worked hours (from Google Calendar): {actual_hours} hours\n")
-        print(f"Difference: {abs(difference)} hours ({diff_label})")
+        print(f"🔁 Difference: {diff_label}")
         print("---------------------------------------------------")
     
     def print_days_report(self):
@@ -734,25 +734,51 @@ def report_testing():
     print(f"🧠 Analyzing data for {user.name.capitalize()} from {start.strftime('%d.%m.%Y')} to {end.strftime('%d.%m.%Y')} (excluding public holidays and vacation events)...")
     report = Report(user, work_calendar, vacation_calendar, holiday_calendar, start, end, all_day_policy)
     report.print_summary()
-    # print("lets check if calculations were correct with the data given:")
-    # print(f"user' working: week{user.contract_working_weekdays}")
-    # print(f"\n>>>Fetching events between {start} and {end}...")
-    # print("-------------------------------------------")
-    # print("Events")
-    # print("-------------------------------------------")
-    # events = work_calendar.fetch_filtered_events(start, end)
-    # if not events:
-    #     print(f"\n No events found between {start} and {end}.")
-    # else:
-    #     print(f"\n Found {len(events)} event(s):")
-    #     for event in events:
-    #         print("•", event.get("summary", "No Title"))
-    # print("\n-------------------------------------------")
-    # print("Shifts")
-    # print("-------------------------------------------")
-    # shifts = work_calendar.get_shifts(start, end, all_day_policy="8hr")
-    # for shift in shifts:
-    #     print(f"{shift['title']}: {shift['start']} - {shift['end']} ({shift['duration']})\n")
+
+    def run_report_loop(user, work_calendar, vacation_calendar, holiday_calendar, all_day_policy):
+        while True:
+            print("\nEnter the period range for your NEW report:")
+            start_date = input_date("Start date (DD.MM.YYYY):\n> ")
+            end_date = input_date("End date (DD.MM.YYYY):\n> ")
+
+            new_report = Report(
+                user=user,
+                work_calendar=work_calendar,
+                vacation_calendar=vacation_calendar,
+                holiday_calendar=holiday_calendar,
+                start_date=start_date,
+                end_date=end_date,
+                all_day_policy=all_day_policy
+            )
+            new_report.print_summary()
+
+            again = input("\nDo you want to generate another report with the SAME CALENDAR(s)? (yes/no): ").strip().lower()
+            if again not in ("yes", "y"):
+                print("Exiting report generator loop.")
+                break
+
+    while True:
+        print("\nDo you want to:")
+        print("1. Generate another report with the SAME CALENDARS")
+        print("2. Start fresh with NEW CALENDAR(s) *")
+        print("3. Exit")
+        choice = input("> ").strip()
+
+        if choice == "1":
+            run_report_loop(user, work_calendar, vacation_calendar, holiday_calendar, all_day_policy)
+
+        elif choice == "2":
+            print("\n🔁 Restarting setup...\n")
+            report_testing()  
+            break
+
+        elif choice == "3":
+            print("\n👋 Thanks for using Working Hours Analyser. Goodbye!")
+            break
+
+        else:
+            print("Please enter 1, 2 or 3.")
+
 
 
 report_testing()
