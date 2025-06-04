@@ -698,91 +698,129 @@ def print_banner():
 
 
 def main():
-    print_banner()
-    user = get_user_data()
-
-    def input_date(prompt):
-        """
-        to get the start_date and end_date for the report range
-        """
-        while True:
-            user_input = input(prompt).strip()
-            try:
-                return datetime.strptime(user_input, "%d.%m.%Y").date()
-            except ValueError:
-                print("😅 Invalid format. Please use DD.MM.YYYY (e.g. 01.05.2024)")
-
-    start = input_date("\nEnter the start date for your report (DD.MM.YYYY):\n> ")
-    end = input_date("\nEnter the end date for your report (DD.MM.YYYY):\n> ")
-    print("""\nIf present, how do you wish to handle your all-day working events? 
-1. Omit
-2. Count them as 8hr shifts
-3. Count them as 24hr shifts""")
-    all_day_options = {
-        "1": "omit",
-        "2": "8h",
-        "3": "24h"
-    }
     while True:
-        choice = input("Type the selected option number:\n> ").strip()
-        if choice in all_day_options:
-            all_day_policy = all_day_options[choice]
-            break
-        else:
-            print("🥴 Invalid option. Please enter 1, 2, or 3.")
+        try:
+            print_banner()
+            user = get_user_data()
 
-    work_calendar = get_calendar_data()
-    vacation_calendar = get_vacation_calendar()
-    holiday_calendar = get_holiday_calendar(user.country_code)
-    print("\nProcessing your request... ⌛ This may take a moment as we fetch events.")
-    print(f"🧠 Analyzing data for {user.name.capitalize()} from {start.strftime('%d.%m.%Y')} to {end.strftime('%d.%m.%Y')} (excluding public holidays and vacation events)...")
-    report = Report(user, work_calendar, vacation_calendar, holiday_calendar, start, end, all_day_policy)
-    report.print_summary()
+            def input_date(prompt):
+                """
+                to get the start_date and end_date for the report range
+                """
+                while True:
+                    user_input = input(prompt).strip()
+                    try:
+                        return datetime.strptime(user_input, "%d.%m.%Y").date()
+                    except ValueError:
+                        print("😅 Invalid format. Please use DD.MM.YYYY (e.g. 01.05.2024)")
+                
+            while True:
+                start = input_date("\nEnter the start date for your report (DD.MM.YYYY):\n> ")
+                end = input_date("\nEnter the end date for your report (DD.MM.YYYY):\n> ")
+                if start > end:
+                    print("⚠️ Start date cannot be after end date. Please try again.\n")
+                else:
+                    break
 
-    def run_report_loop(user, work_calendar, vacation_calendar, holiday_calendar, all_day_policy):
-        while True:
-            print("\nEnter the period range for your NEW report:")
-            start_date = input_date("Start date (DD.MM.YYYY):\n> ")
-            end_date = input_date("End date (DD.MM.YYYY):\n> ")
+            print("""\nIf present, how do you wish to handle your all-day working events? 
+        1. Omit
+        2. Count them as 8hr shifts
+        3. Count them as 24hr shifts""")
+            all_day_options = {
+                "1": "omit",
+                "2": "8h",
+                "3": "24h"
+            }
+            while True:
+                choice = input("Type the selected option number:\n> ").strip()
+                if choice in all_day_options:
+                    all_day_policy = all_day_options[choice]
+                    break
+                else:
+                    print("🥴 Invalid option. Please enter 1, 2, or 3.")
 
-            new_report = Report(
-                user=user,
-                work_calendar=work_calendar,
-                vacation_calendar=vacation_calendar,
-                holiday_calendar=holiday_calendar,
-                start_date=start_date,
-                end_date=end_date,
-                all_day_policy=all_day_policy
-            )
-            new_report.print_summary()
+            work_calendar = get_calendar_data()
+            vacation_calendar = get_vacation_calendar()
+            holiday_calendar = get_holiday_calendar(user.country_code)
+            print("\nProcessing your request... ⌛ This may take a moment as we fetch events.")
+            print(f"🧠 Analyzing data for {user.name.capitalize()} from {start.strftime('%d.%m.%Y')} to {end.strftime('%d.%m.%Y')} (excluding public holidays and vacation events)...")
+            report = Report(user, work_calendar, vacation_calendar, holiday_calendar, start, end, all_day_policy)
+            
+            if report.calculate_actual_working_hours() == 0 or report.calculate_actual_working_days() == 0:
+                print("\n No working events found in the selected calendars during this period.")
+                retry = input("Would you like to try a different date range? (yes/no)\n> ").strip().lower()
+                if retry in ("yes", "y"):
+                    print("🔁 Restarting to allow new date range selection...\n")
+                    continue  # Go back to the start of the loop
+                else:
+                    print("\n👋 Thank you for using the Working Hours Analyser. Goodbye!")
+                    return
+            else:
+                report.print_summary()
 
-            again = input("\nDo you want to generate another report with the SAME CALENDAR(s)? (yes/no): ").strip().lower()
-            if again not in ("yes", "y"):
-                print("Exiting report generator loop.")
+
+            def run_report_loop(user, work_calendar, vacation_calendar, holiday_calendar, all_day_policy):
+                while True:
+                    print("\nEnter the period range for your NEW report:")
+                    start_date = input_date("Start date (DD.MM.YYYY):\n> ")
+                    end_date = input_date("End date (DD.MM.YYYY):\n> ")
+
+                    new_report = Report(
+                        user=user,
+                        work_calendar=work_calendar,
+                        vacation_calendar=vacation_calendar,
+                        holiday_calendar=holiday_calendar,
+                        start_date=start_date,
+                        end_date=end_date,
+                        all_day_policy=all_day_policy
+                    )
+                    
+                    if new_report.calculate_actual_working_hours() == 0 or new_report.calculate_actual_working_days() == 0:
+                        print("\n⚠️ No working events found in the selected calendars during this period.")
+                        retry = input("Would you like to try a different date range? (yes/no)\n> ").strip().lower()
+                        if retry in ("yes", "y"):
+                            print("🔁 Restarting to allow new date range selection...\n")
+                            continue 
+                        else:
+                            print("\n👋 Thank you for using the Working Hours Analyser. Goodbye!")
+                            return 
+                    else:
+                        new_report.print_summary()
+
+                    again = input("\nDo you want to generate another report with the SAME CALENDAR(s)? (yes/no): ").strip().lower()
+                    if again not in ("yes", "y"):
+                        print("Exiting report generator loop.")
+                        break
+
+            while True:
+                print("\nDo you want to:")
+                print("1. Generate another report with the SAME CALENDARS")
+                print("2. Start fresh with NEW CALENDAR(s) *")
+                print("3. Exit")
+                choice = input("> ").strip()
+
+                if choice == "1":
+                    run_report_loop(user, work_calendar, vacation_calendar, holiday_calendar, all_day_policy)
+
+                elif choice == "2":
+                    print("\n🔁 Restarting setup...\n")
+                    main()  
+                    break
+
+                elif choice == "3":
+                    print("\n👋 Thanks for using Working Hours Analyser. Goodbye!")
+                    break
+
+                else:
+                    print("Please enter 1, 2 or 3.")
+        except Exception as e:
+            # NEW: Global error handler
+            print(f"\n😅 Oops, something went wrong: {str(e)}")
+            retry = input("Would you like to start again? (yes/no)\n> ").strip().lower()
+            if retry not in ("yes", "y"):
+                print("\n👋 Thank you for using the Working Hours Analyser, have a nice day!")
                 break
-
-    while True:
-        print("\nDo you want to:")
-        print("1. Generate another report with the SAME CALENDARS")
-        print("2. Start fresh with NEW CALENDAR(s) *")
-        print("3. Exit")
-        choice = input("> ").strip()
-
-        if choice == "1":
-            run_report_loop(user, work_calendar, vacation_calendar, holiday_calendar, all_day_policy)
-
-        elif choice == "2":
-            print("\n🔁 Restarting setup...\n")
-            main()  
-            break
-
-        elif choice == "3":
-            print("\n👋 Thanks for using Working Hours Analyser. Goodbye!")
-            break
-
-        else:
-            print("Please enter 1, 2 or 3.")
-
+            print("\n🔁 Restarting...\n")
 
 
 main()
