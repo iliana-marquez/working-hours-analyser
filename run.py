@@ -2,7 +2,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 import holidays
-from datetime import datetime, date, timedelta, time
+from datetime import datetime, date, timedelta, time, timezone
 from dateutil.parser import parse
 from typing import Optional, List, Dict, Set
 import re
@@ -186,9 +186,9 @@ def get_and_validate_calendar_id(
       - Google Calendar access validation (read permission)
       - option to exit/cancel input
 
-    Args:
-        is_first_time (bool): Show instructions if True.
-        prompt_text (str): Custom input prompt.
+    Args to show instructions only the first time:
+        prompt_text: str = None,
+        show_help_if_first_time: bool = True
 
     Returns:
         str or None: Validated calendar ID, or None if user exits.
@@ -219,23 +219,46 @@ def get_and_validate_calendar_id(
             print("Operation cancelled.")
             exit()
         if not (re.match(calendar_id_pattern, calendar_id) or calendar_id.lower() == "primary"):
-            print("Invalid format. Please enter a valid Calendar ID (not a full URL or @gmail address).\n")
+            print("😳 Invalid format. Please enter a valid Calendar ID (not a full URL or @gmail address).\n")
             continue
-        # Validate access with Google API
+        # Check access by trying to fetch one event with details within next 7 days
+        now = datetime.now(timezone.utc)
+        time_min = now.isoformat()
+        time_max = (now + timedelta(days=30)).isoformat()
         try:
             CALENDAR_SERVICE.calendars().get(calendarId=calendar_id).execute()
-            return calendar_id
+            events_result = CALENDAR_SERVICE.events().list(
+                calendarId=calendar_id,
+                timeMin=time_min,
+                timeMax=time_max,
+                maxResults=1,
+                singleEvents=True,
+                orderBy='startTime'
+            ).execute()
+
+            events = events_result.get('items', [])
+            if events:
+                event = events[0]
+                # Check if event has a 'summary' or other detail fields visible
+                if 'summary' in event and event['summary']:
+                    return calendar_id
+                else:
+                    print("🙈 Your calendar access is limited to free/busy info only, no event details.\n"
+                          "Please ensure the service account has 'See all event details' permission.")
+            else:
+                # No events found but access OK (empty calendar)
+                return calendar_id
+
         except Exception as e:
             print(f"🤔 Could not access this calendar.\n")
             if "notFound" in str(e) or "403" in str(e):
                 print("""👉  Please make sure:
 - The calendar ID exists.
 - You've shared this calendar with the service account:
-working-hours-analyser-sa@working-hours-analyser.iam.gserviceaccount.com
+  working-hours-analyser-sa@working-hours-analyser.iam.gserviceaccount.com
 - If it's an organization calendar, ensure it has at least 'See all event details' permission.
 """)
             print("Try again or type 'exit' to cancel.\n")
-        return calendar_id
 
 
 class Calendar:
