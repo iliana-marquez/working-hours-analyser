@@ -32,6 +32,8 @@ WEEKDAY_ALIASES = {
     'su': 'sun', 'sun': 'sun', 'sunday': 'sun',
 }
 
+_has_shown_calendar_id_help = False 
+
 
 class User:
     def __init__(self, name: str, country_code: str,  weekly_contract_hours: float, contract_working_weekdays: List[str]):
@@ -173,6 +175,69 @@ def get_user_data() -> User:
     return User.from_input()
 
 
+def get_and_validate_calendar_id(
+        prompt_text: str = None,
+        show_help_if_first_time: bool = True
+        ) -> str:
+    """
+    Helper to get calendar ID from user input with:
+      - optional first-time instructions
+      - format validation (email-like or 'primary')
+      - Google Calendar access validation (read permission)
+      - option to exit/cancel input
+
+    Args:
+        is_first_time (bool): Show instructions if True.
+        prompt_text (str): Custom input prompt.
+
+    Returns:
+        str or None: Validated calendar ID, or None if user exits.
+    """
+    global _has_shown_calendar_id_help
+    calendar_id_pattern = r"^[^@]+@[^@]+\.[^@]+$"
+    if show_help_if_first_time and not _has_shown_calendar_id_help:
+        print("\nNow, let's get your Google calendar ID.")
+        print("🔍 Do you know where to find it? (yes/no)")
+        response = input("> ").strip().lower()
+        if response not in ("yes", "y"):
+            print("""
+👉 How to Find Your Google Calendar ID:
+1. Open Google Calendar in your browser.
+2. On the left sidebar, under 'My calendars' or 'Other calendars', find your calendar.
+3. Click the three dots next to it, select 'Settings and sharing'.
+4. Who has acces, this service must have at least read all details acces: \n working-hours-analyser-sa@working-hours-analyser.iam.gserviceaccount.com as a reader.
+4. Scroll to 'Integrate calendar' section.
+5. Copy the 'Calendar ID'\n(looks like an email or ends with @group.calendar.google.com).
+            """)
+        _has_shown_calendar_id_help = True  # Mark as shown
+    if prompt_text:
+        print(prompt_text)
+
+    while True:
+        calendar_id = input("> ").strip()
+        if calendar_id.lower() in {"exit", "cancel"}:
+            print("Operation cancelled.")
+            exit()
+        if not (re.match(calendar_id_pattern, calendar_id) or calendar_id.lower() == "primary"):
+            print("Invalid format. Please enter a valid Calendar ID (not a full URL or @gmail address).\n")
+            continue
+        # Validate access with Google API
+        try:
+            CALENDAR_SERVICE.calendars().get(calendarId=calendar_id).execute()
+            return calendar_id
+        except Exception as e:
+            print(f"🤔 Could not access this calendar.\n")
+            if "notFound" in str(e) or "403" in str(e):
+                print("""👉  Please make sure:
+- The calendar ID exists.
+- You've shared this calendar with the service account:
+working-hours-analyser-sa@working-hours-analyser.iam.gserviceaccount.com
+- If it's an organization calendar, ensure it has at least 'See all event details' permission.
+""")
+            print("Try again or type 'exit' to cancel.\n")
+        return calendar_id
+
+
 class Calendar:
     def __init__(self, calendar_id: str, title_filter: Optional[str] = None):
         self.calendar_id = calendar_id
@@ -180,16 +245,15 @@ class Calendar:
         self.title_filter = title_filter
 
     @classmethod
-    def from_input(calendar_class):
+    def from_input(calendar_class, is_first_time=False, prompt_text=None):
         """
         Collects and validates the calendar ID from input
         """
         while True:
-            calendar_id = input("\nPlease enter the ID of your calendar (e.g., 'primary'):\n> ").strip()
-            if calendar_id:
-                break
-            print("Calendar ID cannot be empty. Please enter your calendar ID.\n")
-        return calendar_class(calendar_id)
+            calendar_id = get_and_validate_calendar_id(is_first_time, prompt_text)
+            if calendar_id is None:
+                raise KeyboardInterrupt("Calendar ID input cancelled by user.")                
+            return calendar_class(calendar_id)
 
     def fetch_events_by_period(self, start_date: date, end_date: date) -> List[dict]:
         """
@@ -237,10 +301,12 @@ class WorkCalendar(Calendar):
         (workcal_class not passed into the super().from_input()
         as it will internally use workcal_class)
         """
-        calendar = super().from_input()
+        calendar_id = get_and_validate_calendar_id(
+            prompt_text="\nPlease enter the ID of the calendar that holds your WORK events 💼 :", 
+            show_help_if_first_time=True
+        )
         title_filter = input("\nEnter a keyword or event title to filter your work events or press enter to skip:\n> ").strip() or None
-        calendar.title_filter = title_filter
-        return calendar
+        return workcal_class(calendar_id, title_filter)
 
     def fetch_filtered_events(self, start_date, end_date):
         """
@@ -329,14 +395,15 @@ class VacationCalendar(Calendar):
     @classmethod
     def from_input(vacationcal_class):
         """
-        To create an instance of VacationCalendar by collecting user input
-        including an optional title filter
+        To create an instance of VacationCalendar 
         """
-        print("\nNow your vacation calendar")
-        calendar = super().from_input()
-        title_filter = input("\nEnter a keyword or event title to filter your vacation events or press Enter to skip:\n> ").strip() or None
-        calendar.title_filter = title_filter
-        return calendar
+        calendar_id = get_and_validate_calendar_id(
+            prompt_text="\nPlease enter the ID of the calendar that holds your VACATION events 🏖️ :",
+            show_help_if_first_time=False
+        )
+        title_filter = input("\nEnter a keyword or event title to filter your vacation events (or press Enter to skip):\n> ").strip() or None
+        return vacationcal_class(calendar_id, title_filter)
+
 
     def fetch_filtered_events(self, start_date, end_date):
         """
@@ -569,10 +636,10 @@ def print_banner():
 def report_testing():
     print_banner()
     user = get_user_data()
-    print("\nUser data succesfully collected:")
-    print(f"Name: {user.name}")
-    print(f"Week Hours: {user.weekly_contract_hours}")
-    print(f"Country Code: {user.country_code}")
+    # print("\nUser data succesfully collected:")
+    # print(f"Name: {user.name}")
+    # print(f"Week Hours: {user.weekly_contract_hours}")
+    # print(f"Country Code: {user.country_code}")
     start = date(2025, 1, 1)
     end = date(2025, 5, 31)
     all_day_policy = "omit"
