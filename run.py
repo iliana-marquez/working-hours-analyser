@@ -53,12 +53,12 @@ class User:
                 break
             print("Please type your name.")
         while True:
-            country_code = input("Please enter your country's two-letter code (e.g., 'AT' for Austria):\n> ").strip()
+            country_code = input("\nPlease enter your country's two-letter code (e.g., 'AT' for Austria):\n> ").strip()
             if len(country_code) == 2 and country_code.isalpha():
                 break
             print("Your country code must be exactly two letters, please try again.")
         while True:
-            hours_input = input("What are your weekly contract hours (e.g., 26.5)?\n> ").strip()
+            hours_input = input("\nWhat are your weekly contract hours (e.g., 26.5)?\n> ").strip()
             try:
                 weekly_contract_hours = float(hours_input)
                 break
@@ -663,9 +663,37 @@ def report_testing():
     # print(f"Name: {user.name}")
     # print(f"Week Hours: {user.weekly_contract_hours}")
     # print(f"Country Code: {user.country_code}")
-    start = date(2025, 1, 1)
-    end = date(2025, 5, 31)
-    all_day_policy = "omit"
+
+    def input_date(prompt):
+        """
+        to get the start_date and end_date for the report range
+        """
+        while True:
+            user_input = input(prompt).strip()
+            try:
+                return datetime.strptime(user_input, "%d.%m.%Y").date()
+            except ValueError:
+                print("😅 Invalid format. Please use DD.MM.YYYY (e.g. 01.05.2024)")
+
+    start = input_date("\nEnter the start date for your report (DD.MM.YYYY):\n> ")
+    end = input_date("\nEnter the end date for your report (DD.MM.YYYY):\n> ")
+    print("""\nIf present, how do you wish to handle your all-day working events? 
+1. Omit
+2. Count them as 8hr shifts
+3. Count them as 24hr shifts""")
+    all_day_options = {
+        "1": "omit",
+        "2": "8h",
+        "3": "24h"
+    }
+    while True:
+        choice = input("Type the selected option number:\n> ").strip()
+        if choice in all_day_options:
+            all_day_policy = all_day_options[choice]
+            break
+        else:
+            print("🥴 Invalid option. Please enter 1, 2, or 3.")
+
     work_calendar = get_calendar_data()
     vacation_calendar = get_vacation_calendar()
     holiday_calendar = get_holiday_calendar(user.country_code)
