@@ -287,15 +287,24 @@ class Calendar:
             expanded_start = start_date - timedelta(days=1)
             time_min = datetime.combine(expanded_start, time.min).isoformat() + 'Z'
             time_max = datetime.combine(end_date, time.max).isoformat() + 'Z'
+            all_events = []
+            page_token = None
+            while True:
+                events_result = CALENDAR_SERVICE.events().list(
+                    calendarId=self.calendar_id,
+                    timeMin=time_min,
+                    timeMax=time_max,
+                    singleEvents=True,
+                    orderBy='startTime',
+                    pageToken=page_token
+                ).execute()
+                events = events_result.get('items', [])
+                all_events.extend(events)
+                page_token = events_result.get('nextPageToken')
+                if not page_token:
+                    break
 
-            events_result = CALENDAR_SERVICE.events().list(
-                calendarId=self.calendar_id,
-                timeMin=time_min,
-                timeMax=time_max,
-                singleEvents=True,
-                orderBy='startTime'
-            ).execute()
-            self.events = events_result.get('items') or []
+            self.events = all_events
         except Exception as e:
             print(f"Error fetching events: {e}")
         return self.events
@@ -686,7 +695,6 @@ def print_banner():
     print("---------------------------------------------------")
     print("Let's get your time tracking sorted 👍")
     print("---------------------------------------------------")
-
 
 
 def main():
