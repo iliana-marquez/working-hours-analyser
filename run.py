@@ -689,13 +689,9 @@ def print_banner():
 
 
 
-def report_testing():
+def main():
     print_banner()
     user = get_user_data()
-    # print("\nUser data succesfully collected:")
-    # print(f"Name: {user.name}")
-    # print(f"Week Hours: {user.weekly_contract_hours}")
-    # print(f"Country Code: {user.country_code}")
 
     def input_date(prompt):
         """
@@ -769,7 +765,7 @@ def report_testing():
 
         elif choice == "2":
             print("\n🔁 Restarting setup...\n")
-            report_testing()  
+            main()  
             break
 
         elif choice == "3":
@@ -781,5 +777,5 @@ def report_testing():
 
 
 
-report_testing()
+main()
 

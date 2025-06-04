@@ -61,3 +61,14 @@ fetch_worksheet()
 print("testing holiday library connection:")
 fetch_holidays(2025)
 print("we are good to go")
+
+
+"""
+want to implement the user input fetched data for user confirmation 
+(in case user used wrong calendar, typo in fiter, etc, just after input)
+for the future
+"""
+# print("\nUser data succesfully collected:")
+    # print(f"Name: {user.name}")
+    # print(f"Week Hours: {user.weekly_contract_hours}")
+    # print(f"Country Code: {user.country_code}")
