@@ -6,7 +6,7 @@
 
 #### The Solution:
 
-> Develop a tool that connects to your Google Calendar, calculating your actual hours worked versus contract hours, tracking and vacation and holiday days, and providing detailed reports — all tailored to flexible work patterns: 
+> Build a tool that connects to your Google Calendar to calculate your actual hours worked versus your contracted hours, while also tracking vacation and local public holidays to generate accurate, detailed reports - all designed to support flexible work schedules and adapt to individual contract or agreement terms.
 
 #### The Result:
 
