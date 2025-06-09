@@ -554,9 +554,11 @@ SCOPE = [
 
 ### Code Validation
 - **Manual Testing**: Tested locally and on Heroku with sample calendars, verifying hours (101.00), days (18), and vacation (3) for 01.01.2025 - 31.01.2025
-<!-- - **PEP Validation**: Used `pycodestyle` and `flake8` to ensure PEP 8 compliance:
-  - Checked indentation, line length, and naming conventions
-  - Fixed issues like missing whitespace around operators -->
+- **PEP Validation**: Used ![CI Python Linter](https://pep8ci.herokuapp.com/) and `flake8` to ensure PEP 8 compliance
+  - **1st Result** after first validation: 118 Errors.
+      - Fixed line length
+      - Removed whitespaces and blank lines
+  - **2nd Result** after corrections: All clear, no errors found.
 
 ---
 ## Testing
