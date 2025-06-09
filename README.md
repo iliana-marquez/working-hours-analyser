@@ -110,173 +110,179 @@ Say goodbye to manually tracking shifts in notebooks or clunky spreadsheets! Thi
 ## Development Process
 
 ### Project Planning
-- Logic was planned by simulating the user flow to identify tasks and actors (user, calendars, report).
+- Logic was planned by simulating the user flow to identify tasks and actors (user, calendars, report). 
+   <details>
+   <summary>Click to display terminal output simulation 👇</summary>
 
-```
-$ python run.py
----------------------------------------------------
-👋  Welcome to the Working Hours Analyser!
----------------------------------------------------
+   ```
+   $ python run.py
+   ---------------------------------------------------
+   👋  Welcome to the Working Hours Analyser!
+   ---------------------------------------------------
 
-Say goodbye to clunky spreadsheets! 
+   Say goodbye to clunky spreadsheets! 
 
-This tool uses your Google Calendar to track:
-- Actual vs. expected hours
-- Workdays, vacation & public holidays
-- Detailed shift breakdowns
+   This tool uses your Google Calendar to track:
+   - Actual vs. expected hours
+   - Workdays, vacation & public holidays
+   - Detailed shift breakdowns
 
-What you'll need: calendar ID(s), contract hours, report period.
-
-
-We'll guide you through 4 quick steps:
-1) Your info
-2) Calendar setup
-3) Report period
-4) Results
-
-Don't worry – it only takes ~1 minute!
+   What you'll need: calendar ID(s), contract hours, report period.
 
 
----------------------------------------------------
-Step 1: Your Info
-----------------------------------------------------
-Enter your name: 
-> Iliana
+   We'll guide you through 4 quick steps:
+   1) Your info
+   2) Calendar setup
+   3) Report period
+   4) Results
 
-Enter your weekly contract hours (e.g., 26.5):
-> 26.5
+   Don't worry – it only takes ~1 minute!
 
-Select your standard working week:
-1. Mon–Fri
-2. Mon–Sat
-3. Flexible (Every day)
-4. Custom (Other specific days or range)
 
-Type the selected option number: 
-> 4
+   ---------------------------------------------------
+   Step 1: Your Info
+   ----------------------------------------------------
+   Enter your name: 
+   > Iliana
 
-Enter your working days (mon, tue, wed, thu, fri, sat, sun):
-------------------------------------------------------------
-You can enter:
- • A range of days (e.g. Mon-Fri or Fri–Mon)
- • A list of specific days (e.g. Mon Tue Fri)
-------------------------------------------------------------
-> Mo-fri
+   Enter your weekly contract hours (e.g., 26.5):
+   > 26.5
 
-Enter your country’s two-letter code for holidays (e.g., ‘AT’ for Austria):
-> AT
+   Select your standard working week:
+   1. Mon–Fri
+   2. Mon–Sat
+   3. Flexible (Every day)
+   4. Custom (Other specific days or range)
 
----------------------------------------------------
-Step 2: Calendar Setup
----------------------------------------------------
-Now need the ID(s) of the calendar(s) you want to analyse. Know where to find it? (yes / no)
-(If yes continue to next question, if not present instructions:)
-—----
-How to Find Your Google Calendar ID
-1. Open Google Calendar in your web browser.
-2. On the left sidebar, under "My calendars" or "Other calendars", find the calendar you want to use.
-3. Click the three dots next to the calendar name, then select "Settings and sharing".
-4. Scroll down to the "Integrate calendar" section.
-5. Find the field labeled "Calendar ID" — it usually looks like an email address (e.g., your.email@gmail.com) or a long string ending with @group.calendar.google.com.
-6. Copy this Calendar ID and paste it into the application when prompted.
-—----
+   Type the selected option number: 
+   > 4
 
-Please enter the ID of your work calendar (e.g., 'primary'):
-130117b726fac70ced@group.calendar.google.com
+   Enter your working days (mon, tue, wed, thu, fri, sat, sun):
+   ------------------------------------------------------------
+   You can enter:
+   • A range of days (e.g. Mon-Fri or Fri–Mon)
+   • A list of specific days (e.g. Mon Tue Fri)
+   ------------------------------------------------------------
+   > Mo-fri
 
-Enter a keyword or event title to filter your work events or press enter to skip.
->
+   Enter your country’s two-letter code for holidays (e.g., ‘AT’ for Austria):
+   > AT
 
-(validate, if not a right format print again or make sure the service account is grated access)
-print("""⚠️ WARNING: Your calendar events appear to only show free/busy information.
-This usually means your service account has insufficient permission to see event details.
-Please make sure:
-- The service account email [working-hours-analyser-sa@working-hours-analyser.iam.gserviceaccount.com] 
- is added as a calendar member with at least 'See all event details' permission.
-- If your calendar is in a Google Workspace org, check sharing restrictions.
- """)
+   ---------------------------------------------------
+   Step 2: Calendar Setup
+   ---------------------------------------------------
+   Now need the ID(s) of the calendar(s) you want to analyse. Know where to find it? (yes / no)
+   (If yes continue to next question, if not present instructions:)
+   —----
+   How to Find Your Google Calendar ID
+   1. Open Google Calendar in your web browser.
+   2. On the left sidebar, under "My calendars" or "Other calendars", find the calendar you want to use.
+   3. Click the three dots next to the calendar name, then select "Settings and sharing".
+   4. Scroll down to the "Integrate calendar" section.
+   5. Find the field labeled "Calendar ID" — it usually looks like an email address (e.g., your.email@gmail.com) or a long string ending with @group.calendar.google.com.
+   6. Copy this Calendar ID and paste it into the application when prompted.
+   —----
 
-Please enter the Calendar ID of your vacation calendar:
-> mitarbeiter_urlaub
+   Please enter the ID of your work calendar (e.g., 'primary'):
+   130117b726fac70ced@group.calendar.google.com
 
-Optionally, enter a keyword or event title to filter vacation events  (e.g., 'Urlaub Iliana'), or press Enter to skip: 
-> Urlaub Iliana
+   Enter a keyword or event title to filter your work events or press enter to skip.
+   >
 
----------------------------------------------------
-Step 3: Report Period
----------------------------------------------------
-Enter the start date for your report (DD.MM.YYYY):
-> 01.05.2024
+   (validate, if not a right format print again or make sure the service account is grated access)
+   print("""⚠️ WARNING: Your calendar events appear to only show free/busy information.
+   This usually means your service account has insufficient permission to see event details.
+   Please make sure:
+   - The service account email [working-hours-analyser-sa@working-hours-analyser.iam.gserviceaccount.com] 
+   is added as a calendar member with at least 'See all event details' permission.
+   - If your calendar is in a Google Workspace org, check sharing restrictions.
+   """)
 
-Enter the end date for your report (DD.MM.YYYY):
-> 31.05.2024
+   Please enter the Calendar ID of your vacation calendar:
+   > mitarbeiter_urlaub
 
-If present, how do you wish to handle your all-day events? 
-1. Omit"
-2. Count them as 8hr shifts"
-3. Count them as 24hr shifts "
-Type the selected option number:
->
+   Optionally, enter a keyword or event title to filter vacation events  (e.g., 'Urlaub Iliana'), or press Enter to skip: 
+   > Urlaub Iliana
 
----------------------------------------------------
-Step 4: Results
----------------------------------------------------
->>> Processing your request... This may take a moment as we fetch events.
->>> Analyzing data for Iliana from 01.05.2024 to 31.05.2024 (excluding public holidays and 'Urlaub Iliana' from 'mitarbeiter_urlaub')...
+   ---------------------------------------------------
+   Step 3: Report Period
+   ---------------------------------------------------
+   Enter the start date for your report (DD.MM.YYYY):
+   > 01.05.2024
 
----------------------------------------------------
-Your Working Hours Report: May 2024
----------------------------------------------------
-Name: Iliana
-Report Period: 01.05.2024 - 31.05.2024
-Working Week: Mo- Fr / 26.5hrs
-Expected working hours (based on contract): 114.83 hours
-Actual worked hours (from Google Calendar): 102.00 hours
-Difference: 12.83 hours below expected
----------------------------------------------------
-Do you want to see your amount of days worked and days of vacations?
-> yes
+   Enter the end date for your report (DD.MM.YYYY):
+   > 31.05.2024
 
->>> Getting your Days Report…
+   If present, how do you wish to handle your all-day events? 
+   1. Omit"
+   2. Count them as 8hr shifts"
+   3. Count them as 24hr shifts "
+   Type the selected option number:
+   >
 
----------------------------------------------------
-Your Days Report: May 2024
----------------------------------------------------
-Name: Iliana
-Working Week: Mo- Fr / 26.5hrs
-Report Period: 01.05.2024 - 31.05.2024
-Working days: 16
-Vacations days: 3 
-Holiday days: 1
----------------------------------------------------
-Vacation days list: [date, title]
-Holiday days list: [date, title]
----------------------------------------------------
+   ---------------------------------------------------
+   Step 4: Results
+   ---------------------------------------------------
+   >>> Processing your request... This may take a moment as we fetch events.
+   >>> Analyzing data for Iliana from 01.05.2024 to 31.05.2024 (excluding public holidays and 'Urlaub Iliana' from 'mitarbeiter_urlaub')...
 
-Do you want to see a detailed list of your shifts for this period? (yes/no)
-> yes
+   ---------------------------------------------------
+   Your Working Hours Report: May 2024
+   ---------------------------------------------------
+   Name: Iliana
+   Report Period: 01.05.2024 - 31.05.2024
+   Working Week: Mo- Fr / 26.5hrs
+   Expected working hours (based on contract): 114.83 hours
+   Actual worked hours (from Google Calendar): 102.00 hours
+   Difference: 12.83 hours below expected
+   ---------------------------------------------------
+   Do you want to see your amount of days worked and days of vacations?
+   > yes
 
->>> Getting your Shifts Report…
+   >>> Getting your Days Report…
 
----------------------------------------------------
-Your Shifts Report: May 2024
----------------------------------------------------
-Name: Iliana
-Report Period: 01.05.2024 - 31.05.2024
-Working Week: Mo- Fr / 26.5hrs
-Total Nr. of Shifts: 5
-02.05.2024 09:00 - 17:00: Team Sync (8.0 hrs)
-03.05.2024 09:00 - 16:30: Project X Deep Dive (7.5 hrs)
-06.05.2024 09:00 - 17:00: Client Meeting (8.0 hrs)
-07.05.2024 09:00 - 17:00: Development Work (8.0 hrs)
-08.05.2024 09:00 - 13:00: Code Review (4.0 hrs)
----------------------------------------------------
+   ---------------------------------------------------
+   Your Days Report: May 2024
+   ---------------------------------------------------
+   Name: Iliana
+   Working Week: Mo- Fr / 26.5hrs
+   Report Period: 01.05.2024 - 31.05.2024
+   Working days: 16
+   Vacations days: 3 
+   Holiday days: 1
+   ---------------------------------------------------
+   Vacation days list: [date, title]
+   Holiday days list: [date, title]
+   ---------------------------------------------------
 
-Do you want to generate another report? (yes (go back to enter report dates) /no)
-> no
+   Do you want to see a detailed list of your shifts for this period? (yes/no)
+   > yes
 
-Thank you for using the Working Hours Analyser! Goodbye, Iliana!
-```
+   >>> Getting your Shifts Report…
+
+   ---------------------------------------------------
+   Your Shifts Report: May 2024
+   ---------------------------------------------------
+   Name: Iliana
+   Report Period: 01.05.2024 - 31.05.2024
+   Working Week: Mo- Fr / 26.5hrs
+   Total Nr. of Shifts: 5
+   02.05.2024 09:00 - 17:00: Team Sync (8.0 hrs)
+   03.05.2024 09:00 - 16:30: Project X Deep Dive (7.5 hrs)
+   06.05.2024 09:00 - 17:00: Client Meeting (8.0 hrs)
+   07.05.2024 09:00 - 17:00: Development Work (8.0 hrs)
+   08.05.2024 09:00 - 13:00: Code Review (4.0 hrs)
+   ---------------------------------------------------
+
+   Do you want to generate another report? (yes (go back to enter report dates) /no)
+   > no
+
+   Thank you for using the Working Hours Analyser! Goodbye, Iliana!
+
+   ```
+
+   </details>
+<br>
 
 - A [GitHub project board](https://github.com/users/iliana-marquez/projects/10) tracked tasks for project completition:
   - Project Dependencies Setup and Deployment.
@@ -554,7 +560,7 @@ SCOPE = [
 
 ### Code Validation
 - **Manual Testing**: Tested locally and on Heroku with sample calendars, verifying hours (101.00), days (18), and vacation (3) for 01.01.2025 - 31.01.2025
-- **PEP Validation**: Used ![CI Python Linter](https://pep8ci.herokuapp.com/) and `flake8` to ensure PEP 8 compliance
+- **PEP Validation**: Used [CI Python Linter](https://pep8ci.herokuapp.com/) and `flake8` to ensure PEP 8 compliance
   - **1st Result** after first validation: 118 Errors.
       - Fixed line length
       - Removed whitespaces and blank lines
@@ -604,8 +610,10 @@ SCOPE = [
 
 ---
 ## Acknowledgments
-- **Code Institute**: For the P3 template and the `love_sandwiches` walkthrough, which inspired automated Google Sheets interaction
-- All external code from libraries (`gspread`, `google-api-python-client`, `holidays`) sourced from PyPI
+- [Code Institute](https://codeinstitute.net/global/): For the [P3 Project Template on GitHub](https://github.com/Code-Institute-Org/p3-template) and the ["Love Sandwiches" Project](https://github.com/Code-Institute-Solutions/love-sandwiches-p5-sourcecode) walkthrough, which inspired this automated Google API interaction.
+- All external code from libraries (`gspread`, `google-api-python-client`, `holidays`) sourced from PyPI.
+- [Markdown Cheatsheet – Markdown Here](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet): Helpful for quick reference to Markdown syntax used throughout this README.
+- [GitHub Docs – Organizing Information with Collapsed Sections](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/quickstart-for-writing-on-github): Used to create collapsible sections for things like terminal simulations on this README.
 
 ---
 ## Key Takeaways
