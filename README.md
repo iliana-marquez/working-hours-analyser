@@ -10,7 +10,7 @@
 
 #### The Result:
 
-> ### [Working Hours Analyser Tool](https://working-hours-analyser-1a0bd1b9ba29.herokuapp.com/)🔗 <br><br> ![alt text](/assets/doc-images/image.png)
+> ### [Working Hours Analyser Tool](https://working-hours-analyser-1a0bd1b9ba29.herokuapp.com/) 🔗 <br><br> ![alt text](/assets/doc-images/image.png)
 
 #### The Details:
 >- [Overview](#overview)
@@ -49,23 +49,23 @@ The **Working Hours Analyser** is a command-line tool that automates the trackin
 
 ## Purpose
 Say goodbye to manually tracking shifts in notebooks or clunky spreadsheets! This tool provides:
-- Automated analysis of work hours from Google Calendar events
-- Comparison of actual hours worked against contract hours
-- Exclusion of public holidays and vacation days for precise calculations
-- Detailed shift breakdowns and summary reports in the terminal
+- Automated analysis of work hours from Google Calendar events.
+- Comparison of actual hours worked against contract hours.
+- Exclusion of public holidays and vacation days for precise calculations.
+- Detailed shift breakdowns and summary reports in the terminal.
 
 ## Target Audience
-- **Flexible & Part-Time Employees**: Verify hours against contracts for fairness and transparency
-- **Freelancers & Consultants**: Generate accurate time reports for invoicing and pricing
-- **Students**: Monitor time spent on study sessions and academic projects
+- **Flexible & Part-Time Employees**: Verify hours against contracts for fairness and transparency.
+- **Freelancers & Consultants**: Generate accurate time reports for invoicing and pricing.
+- **Students**: Monitor time spent on study sessions and academic projects.
 
 ## Features
-1. **User Interaction**: Handles input/output to gather user information
-2. **Google Calendar Integration**: Fetches and processes calendar events
-3. **Public Holidays**: Uses the `holidays` package to adjust calculations
-4. **Contract & Time Calculations**: Computes worked hours, expected hours, and differences
-5. **Vacation Tracking**: Excludes vacation events from work hour calculations
-6. **Reporting**: Displays summary and detailed shift reports in the terminal
+1. **User Interaction**: Handles input/output to gather user information.
+2. **Google Calendar Integration**: Fetches and processes calendar events.
+3. **Public Holidays**: Uses the `holidays` package to adjust calculations.
+4. **Contract & Time Calculations**: Computes worked hours, expected hours, and differences.
+5. **Vacation Tracking**: Excludes vacation events from work hour calculations.
+6. **Reporting**: Displays summary and detailed shift reports in the terminal.
 
 ## User Stories (MVP)
 
@@ -74,35 +74,34 @@ Say goodbye to manually tracking shifts in notebooks or clunky spreadsheets! Thi
 
 ### User Input & Configuration
 - As a user, I want to:
-  - Input my name for personalized reports
-  - Specify my Google Calendar ID for work events
-  - Provide weekly contract hours (e.g., 26.5) for comparison
-  - Enter my country code (e.g., 'AT' for Austria) for public holiday adjustments
-  - Define a report period (start and end dates in DD.MM.YYYY format)
-  - Specify an optional vacation calendar ID and title filter (e.g., "Urlaub Iliana")
-  - Receive clear prompts for all inputs
-  - Get validation and helpful error messages for invalid inputs
+  - Input my name for personalized reports.
+  - Specify my Google Calendar ID for work events.
+  - Provide weekly contract hours (e.g., 26.5) and days of my standard working week (e.g. Mo-Fr) for comparison.
+  - Enter my country code (e.g., 'AT' for Austria) for local public holiday adjustments.
+  - Define a report period (start and end dates in DD.MM.YYYY format).
+  - Specify an optional vacation calendar ID and title filter (e.g., "Urlaub Iliana").
+  - Receive clear prompts for all inputs.
+  - Get validation and helpful error messages for invalid inputs.
 
 ### Data Processing & Analysis
 - As a user, I want the tool to:
-  - Fetch confirmed, timed events from my work calendar within the report period
-  - Exclude public holidays for my country from expected worked hours
-  - Exclude vacation events (matching a title filter) from expected worked hours
-  - Calculate the total duration of actual working events
-  - Compute expected contract hours based on my weekly rate
-  - Compare actual worked hours against expected hours and show the difference
+  - Fetch confirmed, timed events from my work calendar within the report period.
+  - Exclude public holidays for my country from expected worked hours.
+  - Exclude vacation events (matching a title filter) from expected worked hours.
+  - Calculate the total duration of actual working events.
+  - Compute expected contract hours based on my weekly rate.
+  - Compare actual worked hours against expected hours and show the difference.
 
 ### Reporting & Output
 - As a user, I want:
-  - A terminal summary report with my name, report period, expected hours, actual hours, and difference
-  - An option to view a detailed list of individual shifts
-  - The ability to generate another report without restarting the application
+  - A terminal summary report with my name, report period, expected hours, actual hours and difference.
+  - An option to view a detailed list of individual shifts.
+  - The ability to generate another report without restarting the application.
 
 ## UX Features
-- **Clarity**: Concise prompts with examples (e.g. "Mon-Fri")
-<!-- - **User Control**: "Go back" options at key steps and a summary menu (e.g., "Fix: 1=Name, 2=Hours...") -->
-- **Efficiency**: Single report menu and separate ID/filter prompts
-- **Error Prevention/Recovery**: Specific error feedback (e.g., "Invalid calendar ID")
+- **Clarity**: Concise prompts with examples (e.g. "Mon-Fri").
+- **Efficiency**: Single report menu and separate ID / filter prompts.
+- **Error Prevention/Recovery**: Specific error feedback (e.g., "Invalid .calendar ID")
 - **Consistency**: Uniform tone ("Great!"), separators ("---"), and options ("continue/back/exit")
 - **Engagement**: Friendly emojis (😊, 🎉, etc.) and personalized feedback (e.g., "Goodbye, Iliana!")
 
