@@ -407,7 +407,8 @@ SCOPE = [
 > ![alt text](/assets/doc-images/dependencies-connection-test.png)
 
 ### Classes Development 
-- **Important**: cls convention not used, rather correspondent name_class of a class to trace classes behaviour for learning purposes.
+   > **⚠️ Important Note on `cls` Convention**: <br> Instead of the conventional `cls`, class methods use descriptive names like `user_class` or `calendar_class` to clearly indicate the class being instantiated. This choice was made intentionally to aid learning, improve readability and ease debugging - especially for those new to OOP concepts.
+   
 - Develop **User Class**, test locally and on deployed heroku app
       ![alt text](/assets/doc-images/user-class-test.png)
 - Develop **Calendar Class**, test locally and on deployed heroku app
