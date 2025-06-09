@@ -328,36 +328,41 @@ Thank you for using the Working Hours Analyser! Goodbye, Iliana!
 - title_filter: Optional[str]
 - fetch_filtered_events(start_date: date, end_date: date) -> list[Event]
 - get_shifts() -> list[Event]
-- calculate_worked_hours(start_date, end_date) 
-- calculate_worked_days(start_date, end_date)
+- calculate_worked_hours(start_date, end_date) -> float
+- calculate_worked_days(start_date, end_date) -> int
 
 🌴 **VacationCalendar** (inherits from Calendar)
 - title_filter: Optional[str]
-- get_vacation_events(start_date: date, end_date: date) -> list[Event]
+- get_vacation_days(start_date: date, end_date: date) -> set
 - calculate_vacation_days(start_date, end_date) -> int
 
 🇦🇹 **HolidayCalendar** (not a calendar, wraps the holidays package)
 - country_code: str
-- fetch_holidays(start_date, end_date, country_code) -> list[date]
-- count_holidays(start_date, end_date)
+- fetch_holidays(start_date, end_date, country_code) -> List[Dict[str, any]]
+- count_holidays(start_date, end_date) -> int
 
 📊 **Report** (manager Class)
 - user (User instance)
 - work_calendar (WorkCalendar instance)
 - vacation_calendar (optional VacationCalendar instance)
 - holiday_calendar (HolidayCalendar instance)
-- scalculate_contract_hours()
-- calculate_surplus_hours() 
 - start_date: date
 - end_date: date
-- count_days() -> dict (len of different returns from classes above)
-- generate_shift_list() -> list
-- generate_summary() -> str
-- main() to adapt if new input for new report instance will be created
-- policy = input
+- all_day_policy: str
+- calculate_expected_working_days() -> int
+- calculate_vacation_days_count() -> int
+- calculate_holiday_days_count() -> int
+- calculate_total_days_off() -> int
+- calculate_actual_working_days_off() -> int
+- calculate_actual_working_hours() -> float
+- calculate_expected_working_hours() -> float
+- print_summary() -> 
+   - print_hours_report()
+   - print_days_report()
+   - print_shifts_report()
 
 ### Main()
-   Collects period and all-day policy to pass it to Report class to create a report instance
+   Collects period and all-day policy from user input to pass it to Report class to create a report instance
    - all_day_policy: ('omit', '8hr', '24hr')
    - start_date: date
    - end_date: date
