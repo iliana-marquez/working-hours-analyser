@@ -1,175 +1,597 @@
 # Working Hours Analyser
 
-## Introduction
+#### The Problem: 
 
-This application was developed as a personal solution to gain clear and accurate tracking of my working hours, particularly because I work with flexible schedules and freelance projects. Existing tools either lack smooth integration with Google Calendar or require cumbersome manual entry in spreadsheets. This tool bridges that gap by automatically connecting to your Google Calendar, calculating your actual hours worked versus contract hours, tracking vacation and holiday days, and providing detailed reports — all tailored to flexible work patterns.
+> Managing flexible work schedules, part-time contracts, and shifting expectations around hours worked is often confusing and inconsistent, especially when using generic tools like calendars or time trackers. Users frequently lack a clear way to compare their actual working time with what’s expected under their contract or agreement, making it hard to track surplus or deficit hours, plan leave effectively, or advocate for themselves. This creates a real pain point — particularly for freelancers, flexible workers, and part-time employees — who need visibility and control over their time without complex setups or guesswork.
 
-![alt text](image.png)
+#### The Solution:
 
-visit live:
-https://working-hours-analyser-1a0bd1b9ba29.herokuapp.com/
----
+> Develop a tool that connects to your Google Calendar, calculating your actual hours worked versus contract hours, tracking and vacation and holiday days, and providing detailed reports — all tailored to flexible work patterns: 
+
+#### The Result:
+
+> ### [Working Hours Analyser Tool](https://pages.github.com/)🔗 <br><br> ![alt text](/assets/doc-images/image.png)
+
+#### The Details:
+>- [Overview](#overview)
+>- [Purpose](#purpose)
+>- [Target Audience](#target-audience)
+>- [Features](#features)
+>- [User Stories (MVP)](#user-stories-mvp)
+>     - [Core Application Setup](#core-application-setup)
+>     - [User Input & Configuration](#user-input--configuration)
+>     - [Data Processing & Analysis](#data-processing--analysis)
+>     - [Reporting & Output](#reporting--output)
+>- [UX Features](#ux-features)
+>- [Development Process](#development-process)
+>     - [Project Planning](#project-planning)
+>     - [Project Setup](#project-setup)
+>     - [Architecture](#architecture)
+>     - [Class Structure](#class-structure)
+>     - [Dependencies](#dependencies)
+>     - [Python Libraries](#python-libraries)
+>     - [Scope](#scope)
+>     - [Globals](#globals)
+>     - [Connection Test](#connection-test)
+>     - [Bug Fixes & Validation](#bugs--issues-found-during-development)
+>     - [Code Validation](#code-validation)
+>- [Testing](#testing)
+>     - [Manual Testing Procedure](#manual-testing-procedure)
+>     - [Test Calendars](#test-calendars)
+>     - [Service Account](#service-account)
+>- [Future Enhancements](#future-enhancements)
+>- [Acknowledgments](#acknowledgments)
+>- [Key Takeaways](#key-takeaways)
+
+
+## Overview
+The **Working Hours Analyser** is a command-line tool that automates the tracking of work hours by connecting to your Google Calendar. It transforms scheduled events into precise work hour reports, accounting for public holidays and vacation entries to deliver accurate insights.
+
+## Purpose
+Say goodbye to manually tracking shifts in notebooks or clunky spreadsheets! This tool provides:
+- Automated analysis of work hours from Google Calendar events
+- Comparison of actual hours worked against contract hours
+- Exclusion of public holidays and vacation days for precise calculations
+- Detailed shift breakdowns and summary reports in the terminal
+
+## Target Audience
+- **Flexible & Part-Time Employees**: Verify hours against contracts for fairness and transparency
+- **Freelancers & Consultants**: Generate accurate time reports for invoicing and pricing
+- **Students**: Monitor time spent on study sessions and academic projects
 
 ## Features
+1. **User Interaction**: Handles input/output to gather user information
+2. **Google Calendar Integration**: Fetches and processes calendar events
+3. **Public Holidays**: Uses the `holidays` package to adjust calculations
+4. **Contract & Time Calculations**: Computes worked hours, expected hours, and differences
+5. **Vacation Tracking**: Excludes vacation events from work hour calculations
+6. **Reporting**: Displays summary and detailed shift reports in the terminal
 
-- Connects seamlessly to Google Calendar via a service account  
-- Calculates actual hours worked vs. contract hours over any reporting period  
-- Supports filtering work events by keywords  
-- Includes vacation and public holiday days in analysis  
-- Handles flexible working weeks (Mon–Fri, Mon–Sat, flexible, or custom)  
-- Manages all-day events with configurable counting policies (omit, 8hr, 24hr)  
-- Provides detailed shift lists and summary reports  
-- Handles API pagination to fetch all events reliably  
+## User Stories (MVP)
 
----
+### Core Application Setup
+- As a user, I want to understand what the Working Hours Analyser does and how it benefits me.
 
-## Technologies Used
+### User Input & Configuration
+- As a user, I want to:
+  - Input my name for personalized reports
+  - Specify my Google Calendar ID for work events
+  - Provide weekly contract hours (e.g., 26.5) for comparison
+  - Enter my country code (e.g., 'AT' for Austria) for public holiday adjustments
+  - Define a report period (start and end dates in DD.MM.YYYY format)
+  - Specify an optional vacation calendar ID and title filter (e.g., "Urlaub Iliana")
+  - Receive clear prompts for all inputs
+  - Get validation and helpful error messages for invalid inputs
 
-- Python 3.x  
-- Google Calendar API (`google-api-python-client`)  
-- Google Sheets API (`gspread`)  
-- OAuth2 credentials via `google.oauth2.service_account`  
-- `holidays` package for country-specific public holidays  
-- Heroku for deployment  
+### Data Processing & Analysis
+- As a user, I want the tool to:
+  - Fetch confirmed, timed events from my work calendar within the report period
+  - Exclude public holidays for my country from expected worked hours
+  - Exclude vacation events (matching a title filter) from expected worked hours
+  - Calculate the total duration of actual working events
+  - Compute expected contract hours based on my weekly rate
+  - Compare actual worked hours against expected hours and show the difference
 
----
+### Reporting & Output
+- As a user, I want:
+  - A terminal summary report with my name, report period, expected hours, actual hours, and difference
+  - An option to view a detailed list of individual shifts
+  - The ability to generate another report without restarting the application
 
-## Object-Oriented Design Approach
+## UX Features
+- **Clarity**: Concise prompts with examples (e.g. "Mon-Fri")
+<!-- - **User Control**: "Go back" options at key steps and a summary menu (e.g., "Fix: 1=Name, 2=Hours...") -->
+- **Efficiency**: Single report menu and separate ID/filter prompts
+- **Error Prevention/Recovery**: Specific error feedback (e.g., "Invalid calendar ID")
+- **Consistency**: Uniform tone ("Great!"), separators ("---"), and options ("continue/back/exit")
+- **Engagement**: Friendly emojis (😊, 🎉, etc.) and personalized feedback (e.g., "Goodbye, Iliana!")
 
-The application is designed with OOP principles to ensure maintainability, extensibility, and clear separation of concerns:
+## Development Process
 
-- **Encapsulation**: Each class manages its own data and behavior.  
-- **Abstraction**: The rest of the app interacts with calendar classes through simple interfaces without knowing the internal fetching/filtering details.  
-- **Single Responsibility**: Classes have focused roles:  
-  - `User` stores user-specific info (name, contract hours, working days, country code).  
-  - `Calendar` is a base class encapsulating calendar ID and event fetching.  
-  - `WorkCalendar` and `VacationCalendar` extend `Calendar` with specialized methods to fetch, filter, and analyze shifts or vacation events.  
-  - `HolidayCalendar` wraps the `holidays` library for public holiday handling.  
-  - `Report` aggregates data from calendars and user input to compute hours worked, days worked, surplus/deficit, and generate formatted reports.  
-- **Inheritance & Polymorphism**: Calendar subclasses share a common interface, making the code extensible for new calendar types without massive refactoring.
+### Project Planning
+- Logic was planned by simulating the user flow to identify tasks and actors (user, calendars, report).
 
-This design ensures that adding new features, calendar types, or data sources can be done cleanly without disrupting existing logic.
+```
+$ python run.py
+---------------------------------------------------
+👋  Welcome to the Working Hours Analyser!
+---------------------------------------------------
 
----
+Say goodbye to clunky spreadsheets! 
 
-## Development and Testing Workflow
+This tool uses your Google Calendar to track:
+- Actual vs. expected hours
+- Workdays, vacation & public holidays
+- Detailed shift breakdowns
 
-### Initial Setup and API Integration
+What you'll need: calendar ID(s), contract hours, report period.
 
-- Created a Google Cloud project, enabled Google Calendar, Drive, and Sheets APIs.  
-- Generated a service account, downloaded `creds.json`, and shared calendars with the service account’s email.  
-- Installed and configured Python dependencies including `google-api-python-client`, `gspread`, and `holidays`.  
-- Set up authorization and scoped credentials for calendar and spreadsheet access.  
 
-### Development Phases
+We'll guide you through 4 quick steps:
+1) Your info
+2) Calendar setup
+3) Report period
+4) Results
 
-1. **Dependency Connection Test**  
-   - Created a standalone `test.py` script to verify successful connection to Google Calendar and Google Sheets APIs, both locally and after Heroku deployment.  
+Don't worry – it only takes ~1 minute!
 
-2. **User Class Development**  
-   - Encapsulated all user-specific inputs like name, contract hours, working week pattern, and country code.  
-   - Tested input validation locally and remotely.  
 
-3. **Base Calendar Class**  
-   - Implemented general calendar methods: event fetching by period, event filtering by title keyword.  
-   - Incorporated pagination handling for Google Calendar API to ensure all events are retrieved.  
+---------------------------------------------------
+Step 1: Your Info
+----------------------------------------------------
+Enter your name: 
+> Iliana
 
-4. **WorkCalendar Subclass**  
-   - Added methods for fetching filtered work shifts, calculating total worked hours, and counting unique worked days.  
-   - Resolved bugs related to filtering and date clipping for shifts spanning outside report ranges.  
-   - Tested functionality against personal calendar data for accuracy.  
+Enter your weekly contract hours (e.g., 26.5):
+> 26.5
 
-5. **VacationCalendar Subclass**  
-   - Mirrored work calendar event fetching and filtering logic for vacation events.  
-   - Developed date clipping logic to count only vacation days within the reporting period.  
-   - Handled overlap between vacation days and public holidays.  
+Select your standard working week:
+1. Mon–Fri
+2. Mon–Sat
+3. Flexible (Every day)
+4. Custom (Other specific days or range)
 
-6. **HolidayCalendar Wrapper**  
-   - Integrated the `holidays` package for country-specific public holidays.  
-   - Provided methods to fetch and count holidays within a period, filtered by working weekdays.  
+Type the selected option number: 
+> 4
 
-7. **Report Class**  
-   - Combined user data and calendar data to compute expected contract hours, actual worked hours, surplus/deficit, days worked, vacation days (minus overlapping holidays), and total days off.  
-   - Generated formatted summary and detailed shift lists.  
-   - Added error handling and input validations.  
-   - Implemented a CLI flow with guided user prompts and real-time validation for calendar IDs and filters.  
-   - Included a report loop for generating multiple reports in a session with options to reuse or reset calendars.  
+Enter your working days (mon, tue, wed, thu, fri, sat, sun):
+------------------------------------------------------------
+You can enter:
+ • A range of days (e.g. Mon-Fri or Fri–Mon)
+ • A list of specific days (e.g. Mon Tue Fri)
+------------------------------------------------------------
+> Mo-fri
 
-### Testing
+Enter your country’s two-letter code for holidays (e.g., ‘AT’ for Austria):
+> AT
 
-- Tested each class and method locally with mock and real calendar data.  
-- Deployed on Heroku and tested end-to-end user flow including authentication, event fetching, and report generation.  
-- Verified proper handling of edge cases such as all-day events, long date ranges, and API pagination.  
-- Used multiple test calendars with real data (personal and shared test calendars) to ensure realistic performance and accuracy.  
-- Validated input fields for dates, calendar IDs, contract hours, and weekday selections.  
-- Fixed bugs found during testing such as:  
-  - Incorrect filtering logic for event titles.  
-  - Inaccurate worked days count when shifts overlap reporting periods.  
-  - Missing events due to API pagination limits.  
-  - Handling of overlapping vacation and holiday days.  
-- Ensured graceful handling of API errors and invalid inputs with user-friendly messages and restart options.  
+---------------------------------------------------
+Step 2: Calendar Setup
+---------------------------------------------------
+Now need the ID(s) of the calendar(s) you want to analyse. Know where to find it? (yes / no)
+(If yes continue to next question, if not present instructions:)
+—----
+How to Find Your Google Calendar ID
+1. Open Google Calendar in your web browser.
+2. On the left sidebar, under "My calendars" or "Other calendars", find the calendar you want to use.
+3. Click the three dots next to the calendar name, then select "Settings and sharing".
+4. Scroll down to the "Integrate calendar" section.
+5. Find the field labeled "Calendar ID" — it usually looks like an email address (e.g., your.email@gmail.com) or a long string ending with @group.calendar.google.com.
+6. Copy this Calendar ID and paste it into the application when prompted.
+—----
 
----
+Please enter the ID of your work calendar (e.g., 'primary'):
+130117b726fac70ced@group.calendar.google.com
 
-## Future Improvements
+Enter a keyword or event title to filter your work events or press enter to skip.
+>
 
-- Allow custom manual input for all-day event hours beyond preset options.  
-- Add sick days tracking with validation based on local regulations or doctor notes.  
-- Implement time-related bonuses for after-hours or weekend work, customizable per country.  
-- Enhance real-time input validation and confirmation prompts to avoid user errors.  
-- Add export options: Google Sheets, JSON API, PDF reports.  
-- Extend calendar integration beyond Google Calendar (e.g., CalDAV).  
-- Add a web-based GUI for easier interaction.  
-- Implement authentication flow for direct calendar connection by the user.  
+(validate, if not a right format print again or make sure the service account is grated access)
+print("""⚠️ WARNING: Your calendar events appear to only show free/busy information.
+This usually means your service account has insufficient permission to see event details.
+Please make sure:
+- The service account email [working-hours-analyser-sa@working-hours-analyser.iam.gserviceaccount.com] 
+ is added as a calendar member with at least 'See all event details' permission.
+- If your calendar is in a Google Workspace org, check sharing restrictions.
+ """)
 
----
+Please enter the Calendar ID of your vacation calendar:
+> mitarbeiter_urlaub
 
-## Getting Started
+Optionally, enter a keyword or event title to filter vacation events  (e.g., 'Urlaub Iliana'), or press Enter to skip: 
+> Urlaub Iliana
 
-### Prerequisites
+---------------------------------------------------
+Step 3: Report Period
+---------------------------------------------------
+Enter the start date for your report (DD.MM.YYYY):
+> 01.05.2024
 
-- Python 3.8+  
-- Google Cloud Project with Calendar, Drive, and Sheets APIs enabled  
-- Service Account with `creds.json` and calendar sharing set up  
-- Installed Python dependencies from `requirements.txt`  
+Enter the end date for your report (DD.MM.YYYY):
+> 31.05.2024
 
-### Installation
+If present, how do you wish to handle your all-day events? 
+1. Omit"
+2. Count them as 8hr shifts"
+3. Count them as 24hr shifts "
+Type the selected option number:
+>
 
-git clone <repo-url>
-cd working-hours-analyser
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-Running Locally
-git clone <repo-url>
-cd working-hours-analyser
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+---------------------------------------------------
+Step 4: Results
+---------------------------------------------------
+>>> Processing your request... This may take a moment as we fetch events.
+>>> Analyzing data for Iliana from 01.05.2024 to 31.05.2024 (excluding public holidays and 'Urlaub Iliana' from 'mitarbeiter_urlaub')...
 
-### Runnung locally
+---------------------------------------------------
+Your Working Hours Report: May 2024
+---------------------------------------------------
+Name: Iliana
+Report Period: 01.05.2024 - 31.05.2024
+Working Week: Mo- Fr / 26.5hrs
+Expected working hours (based on contract): 114.83 hours
+Actual worked hours (from Google Calendar): 102.00 hours
+Difference: 12.83 hours below expected
+---------------------------------------------------
+Do you want to see your amount of days worked and days of vacations?
+> yes
 
-python run.py
-Follow the guided prompts in the terminal to input your user info, calendar IDs, contract hours, and report period.
+>>> Getting your Days Report…
 
-### Deployment
+---------------------------------------------------
+Your Days Report: May 2024
+---------------------------------------------------
+Name: Iliana
+Working Week: Mo- Fr / 26.5hrs
+Report Period: 01.05.2024 - 31.05.2024
+Working days: 16
+Vacations days: 3 
+Holiday days: 1
+---------------------------------------------------
+Vacation days list: [date, title]
+Holiday days list: [date, title]
+---------------------------------------------------
 
-Push to Heroku (or another cloud platform).
+Do you want to see a detailed list of your shifts for this period? (yes/no)
+> yes
 
-Set environment variables and upload creds.json securely.
+>>> Getting your Shifts Report…
 
-Ensure service account has calendar access.
+---------------------------------------------------
+Your Shifts Report: May 2024
+---------------------------------------------------
+Name: Iliana
+Report Period: 01.05.2024 - 31.05.2024
+Working Week: Mo- Fr / 26.5hrs
+Total Nr. of Shifts: 5
+02.05.2024 09:00 - 17:00: Team Sync (8.0 hrs)
+03.05.2024 09:00 - 16:30: Project X Deep Dive (7.5 hrs)
+06.05.2024 09:00 - 17:00: Client Meeting (8.0 hrs)
+07.05.2024 09:00 - 17:00: Development Work (8.0 hrs)
+08.05.2024 09:00 - 13:00: Code Review (4.0 hrs)
+---------------------------------------------------
 
-Run python run.py via the Heroku console or deploy as a web service.
+Do you want to generate another report? (yes (go back to enter report dates) /no)
+> no
 
-### Testings Calendars Provided
+Thank you for using the Working Hours Analyser! Goodbye, Iliana!
+```
 
-Iliana’s Work Calendar: vcrk5gevoffaskkl57rbl3q1n8@group.calendar.google.com
+- A [GitHub project board](https://github.com/users/iliana-marquez/projects/10) tracked tasks for project completition:
+  - Project Dependencies Setup and Deployment
+  - User input collection (name, contract hours, calendar IDs)
+  - Data processing (fetch events, exclude holidays/vacations)
+  - Report generation (summary, shifts, days)
 
-Cesar’s Work Calendar: 66bf19679262cea6dda330aa828b21fcd59399f1fe0969130117b726fac70ced@group.calendar.google.com
+### Project Setup
+- Created a repository using the Code Institute P3 template
+- Connected to a Heroku project for early deployment and testing
+- Enabled Google APIs (Worksheet, Drive, Calendar) in Google Cloud
+- Added service account email as editor to the worksheet
+- Generated `creds.json` and added it to `.gitignore`
+- Installed dependencies: `gspread`, `google-api-python-client`, `holidays`
+- Reinstalled requirements via `pip freeze > requirements.txt`
 
-Angela’s Calendar: s2msasa4r6ppgpauhjt9h0enu8@group.calendar.google.com (ends 28.02.2025)
+### Architecture
+- **OOP Structure**:
+  - **Encapsulation**: Each class manages its own data and behavior
+  - **Abstraction**: Hides calendar fetching details from the rest of the app
+  - **Single Responsibility**: Each class has one clear purpose
+  - **Inheritance**: Allows easy addition of new calendars/features without massive refactoring
 
-Vacation Calendar: 11knrbjev3res0paa1gkcuq9js@group.calendar.google.com (keywords: urlaub cesar, urlaub iliana, urlaub angela)
+- **Defining the classes**
+   - **User Class**:
+      - To encapsulate user related data (name, contract hours, country code)
+      - Easier to pass around a single user object instead of multiple parameters 
+      - To keep user-related logic centralized
+      - Readable and scalable for future adding of more attributes
+   - **Calendar Classes**:
+      - To encapsulate calender related data (calendar_id)
+      - Easier to abstract calendar access and operations (fetching events, filtering, etc.)
+      - Perform calculations to return the Calendar Events (days, hours, etc...)
+   - **Report Class**:
+      - Handles adding data from the user and calendars, perform calculations and generate the report output
 
-To test with your own calendar, grant the service account email working-hours-analyser-sa@working-hours-analyser.iam.gserviceaccount.com at least "See all event details" permission.
+
+### Class Structure and Data Types
+🧑‍💼 **User**
+- name: str
+- weekly_contract_hours: float
+- contract_working_weekdays: list[days in a working week] (updated)
+- country_code: str
+
+📅 **Calendar** (base class)
+- calendar_id: str
+- fetch_events_by_period(start_date: date, end_date: date) -> list[Events]
+- filter_events_by_title(str) -> list[Event]
+ 
+💼 **WorkCalendar** (inherits from Calendar)
+- title_filter: Optional[str]
+- fetch_filtered_events(start_date: date, end_date: date) -> list[Event]
+- get_shifts() -> list[Event]
+- calculate_worked_hours(start_date, end_date) 
+- calculate_worked_days(start_date, end_date)
+
+🌴 **VacationCalendar** (inherits from Calendar)
+- title_filter: Optional[str]
+- get_vacation_events(start_date: date, end_date: date) -> list[Event]
+- calculate_vacation_days(start_date, end_date) -> int
+
+🇦🇹 **HolidayCalendar** (not a calendar, wraps the holidays package)
+- country_code: str
+- fetch_holidays(start_date, end_date, country_code) -> list[date]
+- count_holidays(start_date, end_date)
+
+📊 **Report** (manager Class)
+- user (User instance)
+- work_calendar (WorkCalendar instance)
+- vacation_calendar (optional VacationCalendar instance)
+- holiday_calendar (HolidayCalendar instance)
+- scalculate_contract_hours()
+- calculate_surplus_hours() 
+- start_date: date
+- end_date: date
+- count_days() -> dict (len of different returns from classes above)
+- generate_shift_list() -> list
+- generate_summary() -> str
+- main() to adapt if new input for new report instance will be created
+- policy = input
+
+### Main()
+   Collects period and all-day policy to pass it to Report class to create a report instance
+   - all_day_policy: ('omit', '8hr', '24hr')
+   - start_date: date
+   - end_date: date
+   - Report.print_summary()
+
+### Dependencies
+- **gspread**: Essential for connecting to and updating Google Sheets for report storage
+- **google.oauth2.service_account.Credentials**: Required for secure authentication with Google APIs via service account
+- **google hammapiclient.discovery.build**: Necessary to build a client for Google Calendar API to fetch events
+- **holidays**: Critical for fetching country-specific public holidays to exclude from work hour calculations
+
+### Python Libraries
+- **datetime**: Provides tools for manipulating dates and times, such as creating, formatting, and comparing them.
+- **dateutil**: Enhances datetime with flexible date parsing, relative time shifts, and timezone handling.
+- **typing**: Enables type hints to clarify function inputs and outputs, improving code readability and safety.
+- **re**: Enables pattern matching and text searching using regular expressions.
+
+### Scope
+- Google Sheets: `https://www.googleapis.com/auth/spreadsheets`
+- Drive (File): `https://www.googleapis.com/auth/drive.file`
+- Drive: `https://www.googleapis.com/auth/drive`
+- Calendar (Read-Only): `https://www.googleapis.com/auth/calendar.readonly`
+
+### Globals
+- `CREDS`: Loaded from `creds.json` via service account
+- `SCOPE_CREDS`: Credentials with defined scopes
+- `GSPREAD_CLIENT`: Authorized gspread client
+- `SHEET`: Opened 'working-hours-reports' sheet
+- `CALENDAR_SERVICE`: Built for Calendar API v3
+
+### Connection Test
+- Tested dependencies locally and on deployed Heroku app and moved testing code to test.py
+- Validated calendar connection (e.g., "Iliana AM/GM Home office")
+- Confirmed Google Worksheet connection
+> ![alt text](/assets/doc-images/dependencies-connection-test.png)
+
+### Classes Development 
+- **Important**: cls convention not used, rather correspondent name_class of a class to trace classes behaviour for learning purposes.
+- Develop **User Class**, test locally and on deployed heroku app
+      ![alt text](/assets/doc-images/user-class-test.png)
+- Develop **Calendar Class**, test locally and on deployed heroku app
+      ![alt text](/assets/doc-images/calendar-class-test.png)
+- Develop **Calendar Class**, test locally and on deployed heroku app
+      ![alt text](/assets/doc-images/calendar-class-test.png)
+- Develop **WorkCalendar Subclass**, test locally and on deployed heroku app
+      ![alt text](/assets/doc-images/workcalendar-class-test.png)
+- Develop **VacationCalendar Subclass**, test locally and on deployed heroku app
+      ![alt text](/assets/doc-images/vationcalendar-class-test.png)
+- Develop **HolidayCalendar**, test locally and on deployed heroku app
+      ![alt text](/assets/doc-images/holidaycalendar-class-test.png)
+- Develop **Report Class**, test locally and on deployed heroku app
+      ![alt text](/assets/doc-images/summary-report-test.png)
+
+### Bugs & Issues Found During Development
+- **Incorrect Keyword Filtering**
+   - **Bug:** The `WorkCalendar` & `VacationCalendar` failed to filter events by keyword properly in the `fetch_filtered_events(self, start_date, end_date)` method, as it was returning all events within range instead of the filtered ones
+   - **Cause:** Used `filter_events_by_period()` instead of a title-based filter.
+   - **Fix:** Replaced with `filter_events_by_title()` from the base Calendar class.
+      ````
+      return self.filter_events_by_title(self.title_filter)
+      ````
+   
+- **Broken Shift Filtering**
+   - **Bug**: on the `get_shifts()` method all events were fetched, not only the filtered ones fetch_events_by_period. 
+   - **Cause**:  Misuse of `filter_events_by_period()`.
+   - **Fix**: Instead of the given `filter_events_by_period()`, used the accurate `fetch_filtered_events()` for the `get_shifts()` method for accurate calculations if a filter keyword is given.
+      ````
+      events = self.fetch_filtered_events(start_date, end_date) 
+      ````
+- **Vacation Events Spanning Outside the Date Range**
+   - **Issue** Vacation events were counted in full if one event passed over the range of a given period of time, the days outside thr range would be counted as well
+   - **Fix**: Clip the start and date of the given period to the user-specified date range to count only the days within this range.
+      ```
+      clipped_start = max(date_start, start_date)
+      clipped_end = min(date_end, end_date)
+         if clipped_start <= clipped_end:
+         for single_day in range((clipped_end - clipped_start).days + 1):
+            day = clipped_start + timedelta(days=single_day)
+            vacation_days.add(day)
+      ```
+
+- **Overflowing Workshifts**      
+   - **Issue**: Shifts that began before the start_date but extended into the range were not being counted.
+   - **Fix**: Adjusted event fetching to include shifts starting one day before the start_date, ensuring that any overflow into the selected range is captured.
+   ````
+   expanded_start = start_date - timedelta(days=1)
+   ````
+
+   
+   - **Issue**: Shifs that started before or ended were overcounted.
+   - **Fix**: Implemented shift "clipping" logic to only count the portion of a shift that falls within the user-given range.
+   ```
+            try:
+                shift_start = parse(shift_raw_start).replace(tzinfo=None)
+                shift_end = parse(shift_raw_end).replace(tzinfo=None)
+                if shift_end <= shift_start:
+                    continue
+            except Exception:
+                continue
+            if shift_end <= range_start or shift_start >= range_end:
+                continue
+            clipped_start = max(shift_start, range_start)
+            clipped_end = min(shift_end, range_end)
+            duration = (clipped_end - clipped_start).total_seconds() / 3600
+            shifts.append({
+                "title": event.get("summary", ""),
+                "start": clipped_start,
+                "end": clipped_end,
+                "duration": duration,
+                "all_day": False
+                })
+   ```
+
+- **Google Calendar Pagination Limit**
+   - **Bug**: Long date ranges returned incomplete data, leading to inaccurate work hour totals (e.g., negative surplus).
+   - **Cause**: The tool retrieved only the first 250 events due to Google Calendar API limits.
+   - **Fix**: Implemented pagination by checking for nextPageToken and looping through all pages until completion.
+   ````
+            all_events = []
+            page_token = None
+            while True:
+                events_result = CALENDAR_SERVICE.events().list(
+                    calendarId=self.calendar_id,
+                    timeMin=time_min,
+                    timeMax=time_max,
+                    singleEvents=True,
+                    orderBy='startTime',
+                    pageToken=page_token
+                ).execute()
+                events = events_result.get('items', [])
+                all_events.extend(events)
+                page_token = events_result.get('nextPageToken')
+                if not page_token:
+                    break
+   ````
+
+- **Report Class logic implementation to accurate calculate expeted vs. actually worked time**
+   - **Issue**: A date that is both a public holiday and part of a vacation period should never be counted twice, nor should a public holiday be treated as personal vacation.
+   - **Solution**: Identify the overlap, subtract it from the vacation set, and leave it out of the holiday set.
+   ````
+        # Get sets of vacation and holiday days
+        self.vacation_days: Set[date] = self.vacation_calendar.get_vacation_days(start_date, end_date)
+        self.holiday_days: Set[date] = {h['date'] for h in self.holiday_calendar.holidays}
+        # Calculate overlapping holiday days within vacation days
+        self.overlapping_days: Set[date] = self.vacation_days & self.holiday_days
+        # Adjust vacation days by removing overlapping holidays
+        self.adjusted_vacation_days: Set[date] = self.vacation_days - self.overlapping_days
+   ````
+
+   - **Issue**: How not to count holidays falling on non-working days (e.g., weekends) or on vacation.
+   - **Solution**: Only count holidays that are working days and not overlapping with vacation.
+   ````
+   contract_workdays = self.user.get_contract_working_weekdays_dates(start_date, end_date)
+   self.adjusted_holiday_days: Set[date] = {
+      day for day in self.holiday_days
+      if day in contract_workdays and day not in self.vacation_days
+   }
+   ````
+
+- **Calendar ID Validation & CLI Feedback Implementation**
+   - **Issue**: Users may input an invalid Calendar ID.
+   - **Cause**: Users may don't know where to find their Calendar ID.
+   - **Fix**: Prompt user for Calendar ID with clear examples (e.g., name@gmail.com or xyz@group.calendar.google.com) and check for valid format before processing.
+   ---
+   - **Issue**: Users may input a valid but inaccessible Calendar ID.
+   - **Cause**: Service account is not added to the calendar.
+   - **Fix**: Add instructions on how to add the service to the calendar and grant access to it.
+   ---
+   - **Issue**: Users my have added the servie to the calendar, but not granted the needed access of at least read only show all details
+   - **Cause**: Some corporate calendars may restrict access to external accounts or user might not know hot to grant the needed access.
+   - **Fix**: Inform user if permissions are missing, show the exact steps to grant the needed access to the service account and highlight potential Google Workspace admin restrictions.
+
+- **Last Minute Bugs**
+   - **Bug**: Invalid Country Code Crash
+   - **Fix**: Wrapped main() and holiday lookup in a try/except block to catch errors and restart the process gracefully.
+   ---
+   - **Bug**: When no events were found, the app still attempted to generate a report.
+   - **Fix**: Added a conditional check — if no events are found, the report is skipped and the user is notified.
+
+
+### Code Validation
+- **Manual Testing**: Tested locally and on Heroku with sample calendars, verifying hours (101.00), days (18), and vacation (3) for 01.01.2025 - 31.01.2025
+<!-- - **PEP Validation**: Used `pycodestyle` and `flake8` to ensure PEP 8 compliance:
+  - Checked indentation, line length, and naming conventions
+  - Fixed issues like missing whitespace around operators -->
+
+## Testing
+
+### Manual Testing Procedure
+- **Setup**: Used test calendars (Iliana, Cesar, Angela) and service account for access
+- **Test Cases**:
+  - Entered valid/invalid calendar IDs to check validation
+  - Tested date ranges especific ranges for event fetching
+  - Verified holiday/vacation exclusion with sample data
+  - Tested Calendar with no details access, no report possible. 
+- **Outcome**: Confirmed accuracy of report restults with data of shifts by verifying report result data with period range and shifts sum
+
+### Test Calendars
+- **Iliana**: `vcrk5gevoffaskk157rbl3q1n8@group.calendar.google.com`
+- **Cesar** (starts 01.03.2025): `66bf19679262cea6dda330aa828b21fcd59399f1fe0969130117b726fac70ced@group.calendar.google.com`
+- **Angela** (ends 28.02.25): `s2msasa4r6ppgpauhjt9h0enu8@group.calendar.google.com`
+- **Urlaube-Mitarbeiter** (keywords: `urlaub cesar`, `urlaub iliana`, `urlaub angela`): `11knrbjev3res0paa1gkcug9js@group.calendar.google.com`
+
+### Service Account
+- If you want to get reports on your own calenders:
+   - Grant at least read-only / show all details access to: `working-hours-analyser-sa@working-hours-analyser.iam.gserviceaccount.com`
+   - **Note***: Hidden details in calendars won’t be handled and return no events
+
+## Future Enhancements
+- **Custom All-Day Policy**: Allow users to input a custom hour value for all-day events.
+- **Sick Days**: Handle sick days based on country rules and doctor’s notes.
+- **Time Bonuses**: Calculate bonuses for after-hours, weekends, or holidays (e.g., in Austria, post-18:30 hours = 1.5x).
+- **Input Validation**: Instant feedback for incorrect user inputs (e.g., typo in name, incorrect workig week hours number, etc.).
+- **User Confirmation**: Display entered data (calendar IDs, filters) for confirmation before printing report.
+- **Written Reports**: Export reports via gspread or JSON for API use.
+- **Broader Calendar Support**: Integrate CalDAV for non-Google calendars.
+- **User Stories (Post-MVP)**
+   -  **User Authentication**
+      - As a first-time user, I want:
+      - Guidance through Google Calendar authentication
+      - To fetch my own calendars after authentication
+      - Secure, ephemeral storage of my access token for the session
+      - Clear error messages if authentication fails
+   - **Reporting & Output**
+      - As a user, I want a written report (worksheet) for personal use, invoicing, or sharing with bosses/clients
+
+## Acknowledgments
+- **Code Institute**: For the P3 template and the `love_sandwiches` walkthrough, which inspired automated Google Sheets interaction
+- All external code from libraries (`gspread`, `google-api-python-client`, `holidays`) sourced from PyPI
+
+## Key Takeaways
+- **Plan First**: Simulate desired outcomes to identify tasks and actors
+- **OOP Power**: Use encapsulation, abstraction, inheritance, and polymorphism for modular, scalable code
+- **User Focus**: Solve familiar problems, then scale to collective needs
+- **Simplicity**: Keep it simple for easier development and debugging
+- **Critical Thinking**: Identifying objects and responsibilities transcends tech stack, enabling faster learning of new languages or tools
