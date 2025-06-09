@@ -168,7 +168,11 @@ class User:
                     selected_days.append(day_index)
 
             if not all_valid:
-                print("Invalid day or range detected. Please use correct day names or ranges (e.g., 'mon', 'wed-fri'). Try again.")
+                print("""
+Invalid day or range detected.
+Please use correct day names or ranges (e.g., 'mon', 'wed-fri')
+Try again."
+""")
                 continue
 
             seen = set()
@@ -704,6 +708,8 @@ class Report:
 """
 Helper and flow methods
 """
+
+
 def print_banner():
     print("---------------------------------------------------")
     print("👋 Welcome to Working Hours Analyser 🔍")
