@@ -32,11 +32,16 @@ WEEKDAY_ALIASES = {
     'su': 'sun', 'sun': 'sun', 'sunday': 'sun',
 }
 
-_has_shown_calendar_id_help = False 
+_has_shown_calendar_id_help = False
 
 
 class User:
-    def __init__(self, name: str, country_code: str,  weekly_contract_hours: float, contract_working_weekdays: List[str]):
+    def __init__(
+        self, name: str,
+        country_code: str,
+        weekly_contract_hours: float,
+        contract_working_weekdays: List[str]
+    ):
         self.name = name
         self.country_code = country_code.upper()
         self.weekly_contract_hours = weekly_contract_hours
@@ -53,21 +58,34 @@ class User:
                 break
             print("Please type your name.")
         while True:
-            country_code = input("\nPlease enter your country's two-letter code (e.g., 'AT' for Austria):\n> ").strip()
+            country_code = input(
+                "\nPlease enter your country's two-letter code (e.g., 'AT' for Austria):\n> "
+            ).strip()
             if len(country_code) == 2 and country_code.isalpha():
                 break
-            print("Your country code must be exactly two letters, please try again.")
+            print(
+                "Your country code must be exactly two letters, please try again."
+            )
         while True:
-            hours_input = input("\nWhat are your weekly contract hours (e.g., 26.5)?\n> ").strip()
+            hours_input = input(
+                "\nWhat are your weekly contract hours (e.g., 26.5)?\n> "
+            ).strip()
             try:
                 weekly_contract_hours = float(hours_input)
                 break
             except ValueError:
-                print("Please enter a valid number (e.g., 26.5) for calculations.")
+                print(
+                    "Please enter a valid number (e.g., 26.5) for calculations."
+                )
 
-        contract_working_weekdays =  user_class.get_contract_working_weekdays()
+        contract_working_weekdays = user_class.get_contract_working_weekdays()
 
-        return user_class(name, country_code, weekly_contract_hours, contract_working_weekdays)
+        return user_class(
+            name,
+            country_code,
+            weekly_contract_hours,
+            contract_working_weekdays
+        )
     
     @staticmethod
     def get_contract_working_weekdays() -> List[int]:
