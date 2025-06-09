@@ -62,8 +62,8 @@ Say goodbye to manually tracking shifts in notebooks or clunky spreadsheets! Thi
 ## Features
 1. **User Interaction**: Handles input/output to gather user information.
 2. **Google Calendar Integration**: Fetches and processes calendar events.
-3. **Public Holidays**: Uses the `holidays` package to adjust calculations.
-4. **Contract & Time Calculations**: Computes worked hours, expected hours, and differences.
+3. **Public Holidays**: Uses the `holidays` package to adjust calculations locally.
+4. **Contract & Time Calculations**: Computes worked hours, expected hours and differences.
 5. **Vacation Tracking**: Excludes vacation events from work hour calculations.
 6. **Reporting**: Displays summary and detailed shift reports in the terminal.
 
@@ -278,40 +278,39 @@ Thank you for using the Working Hours Analyser! Goodbye, Iliana!
 ```
 
 - A [GitHub project board](https://github.com/users/iliana-marquez/projects/10) tracked tasks for project completition:
-  - Project Dependencies Setup and Deployment
-  - User input collection (name, contract hours, calendar IDs)
-  - Data processing (fetch events, exclude holidays/vacations)
-  - Report generation (summary, shifts, days)
+  - Project Dependencies Setup and Deployment.
+  - User input collection (name, contract hours, calendar IDs).
+  - Data processing (fetch events, exclude holidays/vacations).
+  - Report generation (summary, shifts, days).
 
 ### Project Setup
-- Created a repository using the Code Institute P3 template
-- Connected to a Heroku project for early deployment and testing
-- Enabled Google APIs (Worksheet, Drive, Calendar) in Google Cloud
-- Added service account email as editor to the worksheet
-- Generated `creds.json` and added it to `.gitignore`
-- Installed dependencies: `gspread`, `google-api-python-client`, `holidays`
-- Reinstalled requirements via `pip freeze > requirements.txt`
+- Created a repository using the Code Institute P3 template.
+- Connected to a Heroku project for early deployment and testing.
+- Enabled Google APIs (Worksheet, Drive, Calendar) in Google Cloud.
+- Added service account email as editor to the worksheet.
+- Generated `creds.json` and added it to `.gitignore`.
+- Installed dependencies: `gspread`, `google-api-python-client`, `holidays`.
+- Reinstalled requirements via `pip freeze > requirements.txt`.
 
 ### Architecture
 - **OOP Structure**:
-  - **Encapsulation**: Each class manages its own data and behavior
-  - **Abstraction**: Hides calendar fetching details from the rest of the app
-  - **Single Responsibility**: Each class has one clear purpose
-  - **Inheritance**: Allows easy addition of new calendars/features without massive refactoring
+  - **Encapsulation**: Each class manages its own data and behavior.
+  - **Abstraction**: Hides calendar fetching details from the rest of the app.
+  - **Single Responsibility**: Each class has one clear purpose.
+  - **Inheritance**: Allows easy addition of new calendars/features without massive refactoring.
 
 - **Defining the classes**
    - **User Class**:
-      - To encapsulate user related data (name, contract hours, country code)
-      - Easier to pass around a single user object instead of multiple parameters 
-      - To keep user-related logic centralized
-      - Readable and scalable for future adding of more attributes
+      - To encapsulate user related data (name, contract hours, country code).
+      - Easier to pass around a single user object instead of multiple parameter.
+      - To keep user-related logic centralized.
+      - Readable and scalable for future adding of more attributes.
    - **Calendar Classes**:
-      - To encapsulate calender related data (calendar_id)
-      - Easier to abstract calendar access and operations (fetching events, filtering, etc.)
-      - Perform calculations to return the Calendar Events (days, hours, etc...)
+      - To encapsulate calender related data (calendar_id).
+      - Easier to abstract calendar access and operations (fetching events, filtering, etc.).
+      - Perform calculations to return the Calendar Events (days, hours, etc...).
    - **Report Class**:
-      - Handles adding data from the user and calendars, perform calculations and generate the report output
-
+      - Handles user and calendar data to perform calculations and generate the report output.
 
 ### Class Structure and Data Types
 🧑‍💼 **User**
