@@ -2,7 +2,7 @@
 
 #### The Problem: 
 
-> Managing flexible work schedules, part-time contracts, and shifting expectations around hours worked is often confusing and inconsistent, especially when using generic tools like calendars or time trackers. Users frequently lack a clear way to compare their actual working time with what’s expected under their contract or agreement, making it hard to track surplus or deficit hours, plan leave effectively, or advocate for themselves. This creates a real pain point — particularly for freelancers, flexible workers, and part-time employees — who need visibility and control over their time without complex setups or guesswork.
+> Managing flexible work schedules, part-time contracts, and shifting expectations around hours worked is often confusing and inconsistent, especially when using generic tools like calendars or time trackers. Users frequently lack a clear way to compare their actual working time with what’s expected under their contract or agreement, making it hard to track surplus or deficit hours, plan leave effectively, or advocate for themselves. This creates a real pain point — particularly for freelancers, flexible workers or part-time employees — who need visibility and control over their time without complex setups or guesswork.
 
 #### The Solution:
 
