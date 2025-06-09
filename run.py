@@ -653,19 +653,28 @@ class Report:
             all_day_policy
         )
         # Get sets of vacation and holiday days
-        self.vacation_days: Set[date] = self.vacation_calendar.get_vacation_days(
+        self.vacation_days: Set[date] = (
+            self.vacation_calendar.get_vacation_days(
                 start_date,
-                end_date,
+                end_date
             )
+        )
         self.holiday_days: Set[date] = {
             h['date'] for h in self.holiday_calendar.holidays
         }
         # Calculate overlapping holiday days within vacation days
-        self.overlapping_days: Set[date] = self.vacation_days & self.holiday_days
+        self.overlapping_days: Set[date] = (
+            self.vacation_days & self.holiday_days
+        )
         # Adjust vacation days by removing overlapping holidays
-        self.adjusted_vacation_days: Set[date] = self.vacation_days - self.overlapping_days
-        # FIXED: Only count holidays that are working days AND not overlapping with vacation
-        contract_workdays = self.user.get_contract_working_weekdays_dates(start_date, end_date)
+        self.adjusted_vacation_days: Set[date] = (
+            self.vacation_days - self.overlapping_days
+        )
+        # Only count holidays that are working days & dont overlap vacation
+        contract_workdays = self.user.get_contract_working_weekdays_dates(
+            start_date,
+            end_date
+        )
         self.adjusted_holiday_days: Set[date] = {
             day for day in self.holiday_days
             if day in contract_workdays and day not in self.vacation_days
@@ -778,9 +787,9 @@ class Report:
         difference = round(actual_hours - expected_hours, 2)
 
         if difference > 0:
-            diff_label = f"{abs(difference)} ⬆️ hours above expected"
+            diff_label = f"{abs(difference)} ⬆️  hours above expected"
         elif difference < 0:
-            diff_label = f"{abs(difference)} ⬇️ hours below expected"
+            diff_label = f"{abs(difference)} ⬇️  hours below expected"
         else:
             diff_label = "🎯 exactly on target"
 
@@ -789,9 +798,9 @@ class Report:
             f"{expected_hours} hours\n"
         )
         print(
-            "✅  Actual worked hours (from Google Calendar): "
+            "✅ Actual worked hours (from Google Calendar): "
             f"{actual_hours} hours\n")
-        print(f"🔁  Difference: {diff_label}")
+        print(f"🔁 Difference: {diff_label}")
         print("---------------------------------------------------")
 
     def print_days_report(self):
@@ -799,17 +808,28 @@ class Report:
         print("---------------------------------------------------")
         print(f"Your Days Report: {self.start_date.strftime('%B %Y')}")
         print("---------------------------------------------------")
-        print(f"👤  Name: {self.user.name}\n")
+        print(f"👤 Name: {self.user.name}\n")
         print(
-            f"📊  Report Period: {self.start_date.strftime('%d.%m.%Y')} - "
+            f"📊 Report Period: {self.start_date.strftime('%d.%m.%Y')} - "
             f"{self.end_date.strftime('%d.%m.%Y')}\n"
         )
         print(
-            "📅  Expected working days: "
+            "📅 Expected working days: "
             f"{self.calculate_expected_working_days()}\n"
         )
-        print(f"✅  Working days: {self.calculate_actual_working_days()}\n")
-        print(f"🏖️  Vacation days: {self.calculate_vacation_days_count()}")
+        print(f"✅ Working days: {self.calculate_actual_working_days()}\n")
+        print(f"🏖️  Vacation days: {self.calculate_vacation_days_count()}\n")
+        print(f"🎉 Public Holiday days: {self.calculate_holiday_days_count()}")
+        print("---------------------------------------------------")
+        print("Holidays accounted")
+        for holiday in self.adjusted_holiday_days:
+            date_str = holiday.strftime('%d.%m.%Y')
+            print(f"{date_str}")
+        print("---------------------------------------------------")
+        print("Vacation days accounted")
+        for vacation_day in self.adjusted_vacation_days:
+            date_str = vacation_day.strftime('%d.%m.%Y')
+            print(f"{date_str}")
         print("---------------------------------------------------")
 
     def print_shifts_report(self):
@@ -817,11 +837,13 @@ class Report:
         print("---------------------------------------------------")
         print(f"Your Shifts Report: {self.start_date.strftime('%B %Y')}")
         print("---------------------------------------------------")
-        print(f"👤 Name: {self.user.name}\n")
+        print(f"👤  Name: {self.user.name}\n")
         print(
-            f"📊 Report Period: {self.start_date.strftime('%d.%m.%Y')} - "
+            f"📊  Report Period: {self.start_date.strftime('%d.%m.%Y')} - "
             f"{self.end_date.strftime('%d.%m.%Y')}\n"
         )
+        count_shifts = len(self.shifts)
+        print(f"✅  {count_shifts} Total Shifts\n")
 
         for shift in self.shifts:
             date_str = shift["start"].strftime("%d.%m.%Y")
