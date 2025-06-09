@@ -197,7 +197,7 @@ Try again."
             end_date: date
     ) -> Set[date]:
         """
-        Return the set of dates between start_date and end_date 
+        Return the set of dates between start_date and end_date
         that fall on contract working weekdays.
         Used to filter holidays that actually fall on working days.
         """
@@ -267,10 +267,13 @@ def get_and_validate_calendar_id(
         if calendar_id.lower() in {"exit", "cancel"}:
             print("Operation cancelled.")
             exit()
-        if not (re.match(calendar_id_pattern, calendar_id) or calendar_id.lower() == "primary"):
-            print("😳 Invalid format. Please enter a valid Calendar ID (not a full URL or @gmail address).\n")
+        if not (re.match(calendar_id_pattern, calendar_id)
+                or calendar_id.lower() == "primary"):
+            print(
+                "😳 Invalid format. Please enter a valid Calendar ID "
+                "(not a full URL or @gmail address).\n")
             continue
-        # Check access by trying to fetch one event with details within next 7 days
+        # Check access by trying to fetch 1 event w/ details within next 7 days
         now = datetime.now(timezone.utc)
         time_min = now.isoformat()
         time_max = (now + timedelta(days=30)).isoformat()
@@ -292,8 +295,11 @@ def get_and_validate_calendar_id(
                 if 'summary' in event and event['summary']:
                     return calendar_id
                 else:
-                    print("🙈 Your calendar access is limited to free/busy info only, no event details.\n"
-                          "Please ensure the service account has 'See all event details' permission.")
+                    print(
+                        "🙈 Your calendar access is limited to free/busy info "
+                        "only, no event details.\n"
+                        "Please ensure the service account has "
+                        "'See all event details' permission.")
             else:
                 # No events found but access OK (empty calendar)
                 return calendar_id
@@ -323,19 +329,28 @@ class Calendar:
         Collects and validates the calendar ID from input
         """
         while True:
-            calendar_id = get_and_validate_calendar_id(is_first_time, prompt_text)
+            calendar_id = get_and_validate_calendar_id(
+                is_first_time,
+                prompt_text
+            )
             if calendar_id is None:
-                raise KeyboardInterrupt("Calendar ID input cancelled by user.")                
+                raise KeyboardInterrupt("Calendar ID input cancelled by user.")
             return calendar_class(calendar_id)
 
-    def fetch_events_by_period(self, start_date: date, end_date: date) -> List[dict]:
+    def fetch_events_by_period(
+            self,
+            start_date: date,
+            end_date: date
+    ) -> List[dict]:
         """
         Fetches events from the calendar using its ID
         within a given period of time.
         """
         try:
             expanded_start = start_date - timedelta(days=1)
-            time_min = datetime.combine(expanded_start, time.min).isoformat() + 'Z'
+            time_min = datetime.combine(
+                expanded_start,
+                time.min).isoformat() + 'Z'
             time_max = datetime.combine(end_date, time.max).isoformat() + 'Z'
             all_events = []
             page_token = None
@@ -359,7 +374,10 @@ class Calendar:
             print(f"Error fetching events: {e}")
         return self.events
 
-    def filter_events_by_title(self, title_filter: Optional[str] = None) -> List[dict]:
+    def filter_events_by_title(
+            self,
+            title_filter: Optional[str] = None
+    ) -> List[dict]:
         """
         Filters events by title keyword if provided
         (not casesensitive)
@@ -384,7 +402,7 @@ class WorkCalendar(Calendar):
         as it will internally use workcal_class)
         """
         calendar_id = get_and_validate_calendar_id(
-            prompt_text="\nPlease enter the ID of the calendar that holds your WORK events 💼 :", 
+            prompt_text="\nPlease enter the ID of the calendar that holds your WORK events 💼 :",
             show_help_if_first_time=True
         )
         title_filter = input("\nEnter a keyword or event title to filter your work events or press enter to skip:\n> ").strip() or None
@@ -398,7 +416,12 @@ class WorkCalendar(Calendar):
         self.fetch_events_by_period(start_date, end_date)
         return self.filter_events_by_title(self.title_filter)
 
-    def get_shifts(self, start_date, end_date, all_day_policy: str = "omit") -> list[dict]:
+    def get_shifts(
+            self,
+            start_date,
+            end_date,
+            all_day_policy: str = "omit"
+    ) -> list[dict]:
         """
         Fetches filtered events to return a list of shifts
         that fall within the [start_date, end_date] range
@@ -416,7 +439,10 @@ class WorkCalendar(Calendar):
             start_info = event.get("start", {})
             end_info = event.get("end", {})
             is_all_day = "date" in start_info and "date" in end_info
-            shift_raw_start = start_info.get("dateTime") or start_info.get("date")
+            shift_raw_start = (
+                start_info.get("dateTime")
+                or start_info.get("date")
+            )
             shift_raw_end = end_info.get("dateTime") or end_info.get("date")
             if is_all_day:
                 if all_day_policy == "omit":
@@ -477,15 +503,17 @@ class VacationCalendar(Calendar):
     @classmethod
     def from_input(vacationcal_class):
         """
-        To create an instance of VacationCalendar 
+        To create an instance of VacationCalendar
         """
         calendar_id = get_and_validate_calendar_id(
             prompt_text="\nPlease enter the ID of the calendar that holds your VACATION events 🏖️ :",
             show_help_if_first_time=False
         )
-        title_filter = input("\nEnter a keyword or event title to filter your vacation events (or press Enter to skip):\n> ").strip() or None
+        title_filter = input(
+            "\nEnter a keyword or event title to filter your "
+            "vacation events (or press Enter to skip):\n> "
+        ).strip() or None
         return vacationcal_class(calendar_id, title_filter)
-
 
     def fetch_filtered_events(self, start_date, end_date):
         """
@@ -543,7 +571,7 @@ class HolidayCalendar:
 
     def fetch_holidays(self, start_date: date, end_date: date) -> List[Dict[str, any]]:
         """
-        To fetch the official public holidays between start_date and 
+        To fetch the official public holidays between start_date and
         end_date for the given country
         """
         all_holidays = holidays.country_holidays(self.country_code)
@@ -557,7 +585,7 @@ class HolidayCalendar:
                 })
             included_day += timedelta(days=1)
         return self.holidays
-    
+
     def count_holidays(self) -> int:
         return len(self.holidays)
 
@@ -619,13 +647,13 @@ class Report:
                 if current_day not in self.adjusted_holiday_days and current_day not in self.adjusted_vacation_days:
                     expected_days += 1
         return expected_days
-    
+
     def calculate_vacation_days_count(self) -> int:
         """
         To return the count of vacation days after subtracting overlapping holidays
         """
         return len(self.adjusted_vacation_days)
-    
+
     def calculate_holiday_days_count(self) -> int:
         """
         To return the count of all holidays in the period that fall on working days
@@ -651,7 +679,7 @@ class Report:
         To return the actual worked hours in the period using the calendar.
         """
         return self.work_calendar.calculate_worked_hours(self.start_date, self.end_date, self.all_day_policy)
-    
+
     def calculate_expected_working_hours(self) -> float:
         """
         To calculate expected working hours based on the user's weekly hours and
@@ -676,14 +704,14 @@ class Report:
         show_shifts_report = input("\nDo you want to see a detailed list of your shifts for this period? (yes/no)\n> ").strip().lower()
         if show_shifts_report in ("yes", "y"):
             self.print_shifts_report()
-    
+
     def print_hours_report(self):
         print("\n---------------------------------------------------")
         print(f"Your Working Hours Report: {self.start_date.strftime('%B %Y')}")
         print("---------------------------------------------------")
         print(f"👤 Name: {self.user.name}\n")
         print(f"📊 Report Period: {self.start_date.strftime('%d.%m.%Y')} - {self.end_date.strftime('%d.%m.%Y')}\n")
-        
+
         expected_hours = round(self.calculate_expected_working_hours(), 2)
         actual_hours = round(self.calculate_actual_working_hours(), 2)
         difference = round(actual_hours - expected_hours, 2)
@@ -699,7 +727,7 @@ class Report:
         print(f"✅ Actual worked hours (from Google Calendar): {actual_hours} hours\n")
         print(f"🔁 Difference: {diff_label}")
         print("---------------------------------------------------")
-    
+
     def print_days_report(self):
         print("\n>>> Getting your Days Report…\n")
         print("---------------------------------------------------")
@@ -743,7 +771,7 @@ def print_banner():
     print("vacations, holidays and gives you a clean shift summary.\n")
     print("🔧 All you'll need:")
     print("Calendar ID(s), contract hours & a date range.\n")
-    print("Don't worry - the setup is fully guided and takes less than a minute.")
+    print("Don't worry - the setup is fully guided and takes less than a min.")
     print("---------------------------------------------------")
     print("Let's get your time tracking sorted 👍")
     print("---------------------------------------------------")
@@ -810,7 +838,7 @@ def main():
             print("\nProcessing your request... ⌛ This may take a moment as we fetch events.")
             print(f"🧠 Analyzing data for {user.name.capitalize()} from {start.strftime('%d.%m.%Y')} to {end.strftime('%d.%m.%Y')} (excluding public holidays and vacation events)...")
             report = Report(user, work_calendar, vacation_calendar, holiday_calendar, start, end, all_day_policy)
-            
+
             if report.calculate_actual_working_hours() == 0 or report.calculate_actual_working_days() == 0:
                 print("\n No working events found in the selected calendars during this period.")
                 retry = input("Would you like to try a different date range? (yes/no)\n> ").strip().lower()
@@ -822,7 +850,6 @@ def main():
                     return
             else:
                 report.print_summary()
-
 
             def run_report_loop(user, work_calendar, vacation_calendar, holiday_calendar, all_day_policy):
                 while True:
@@ -839,16 +866,16 @@ def main():
                         end_date=end_date,
                         all_day_policy=all_day_policy
                     )
-                    
+
                     if new_report.calculate_actual_working_hours() == 0 or new_report.calculate_actual_working_days() == 0:
                         print("\n⚠️ No working events found in the selected calendars during this period.")
                         retry = input("Would you like to try a different date range? (yes/no)\n> ").strip().lower()
                         if retry in ("yes", "y"):
                             print("🔁 Restarting to allow new date range selection...\n")
-                            continue 
+                            continue
                         else:
                             print("\n👋 Thank you for using the Working Hours Analyser. Goodbye!")
-                            return 
+                            return
                     else:
                         new_report.print_summary()
 
@@ -869,7 +896,7 @@ def main():
 
                 elif choice == "2":
                     print("\n🔁 Restarting setup...\n")
-                    main()  
+                    main()
                     break
 
                 elif choice == "3":
@@ -889,4 +916,3 @@ def main():
 
 
 main()
-
