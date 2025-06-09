@@ -613,7 +613,7 @@ SCOPE = [
 - [Code Institute](https://codeinstitute.net/global/): For the [P3 Project Template on GitHub](https://github.com/Code-Institute-Org/p3-template) and the ["Love Sandwiches" Project](https://github.com/Code-Institute-Solutions/love-sandwiches-p5-sourcecode) walkthrough, which inspired this automated Google API interaction.
 - All external code from libraries (`gspread`, `google-api-python-client`, `holidays`) sourced from PyPI.
 - [Markdown Cheatsheet – Markdown Here](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet): Helpful for quick reference to Markdown syntax used throughout this README.
-- [GitHub Docs – Organizing Information with Collapsed Sections](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/quickstart-for-writing-on-github): Used to create collapsible sections for things like terminal simulations on this README.
+- [GitHub Docs – Organizing Information with Collapsed Sections](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/quickstart-for-writing-on-github): Used to create collapsible sections for things like the terminal simulation on this README.
 
 ---
 ## Key Takeaways
