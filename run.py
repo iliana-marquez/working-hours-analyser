@@ -186,18 +186,29 @@ Try again."
             ]
             if unique_days:
                 return unique_days
-            print("Invalid format. Try again using day names (e.g ''Mon Wed Fri') and/or ranges (e.g Wed-Fri)")
+            print(
+                "Invalid format. Try again using day names "
+                "(e.g ''Mon Wed Fri') and/or ranges (e.g Wed-Fri)"
+            )
 
-    def get_contract_working_weekdays_dates(self, start_date: date, end_date: date) -> Set[date]:
+    def get_contract_working_weekdays_dates(
+            self,
+            start_date: date,
+            end_date: date
+    ) -> Set[date]:
         """
-        Return the set of dates between start_date and end_date that fall on contract working weekdays.
+        Return the set of dates between start_date and end_date 
+        that fall on contract working weekdays.
         Used to filter holidays that actually fall on working days.
         """
         all_days = (end_date - start_date).days + 1
         return {
             start_date + timedelta(days=i)
             for i in range(all_days)
-            if (start_date + timedelta(days=i)).weekday() in self.contract_working_weekdays
+            if (
+                start_date +
+                timedelta(days=i)
+            ).weekday() in self.contract_working_weekdays
         }
 
 
@@ -234,13 +245,18 @@ def get_and_validate_calendar_id(
         response = input("> ").strip().lower()
         if response not in ("yes", "y"):
             print("""
-👉 How to Find Your Google Calendar ID:
+👉 How to Find and Share Your Google Calendar ID:
+-------------------------------------------
 1. Open Google Calendar in your browser.
-2. On the left sidebar, under 'My calendars' or 'Other calendars', find your calendar.
-3. Click the three dots next to it, select 'Settings and sharing'.
-4. Who has acces, this service must have at least read all details acces: \n working-hours-analyser-sa@working-hours-analyser.iam.gserviceaccount.com as a reader.
-4. Scroll to 'Integrate calendar' section.
-5. Copy the 'Calendar ID'\n(looks like an email or ends with @group.calendar.google.com).
+2. In the left sidebar, find your calendar under:
+    'My calendars' or 'Other calendars'.
+3. Click the three dots next to it → 'Settings and sharing'.
+4. Under 'Share with specific people', add:
+   -> working-hours-analyser-sa@working-hours-analyser.iam.gserviceaccount.com
+   -> Permission: 'See all event details'.
+5. Scroll to 'Integrate calendar' and copy the Calendar ID
+   (It looks like an email address or ends with @group.calendar.google.com).
+-------------------------------------------
             """)
         _has_shown_calendar_id_help = True  # Mark as shown
     if prompt_text:
@@ -748,20 +764,33 @@ def main():
                     try:
                         return datetime.strptime(user_input, "%d.%m.%Y").date()
                     except ValueError:
-                        print("😅 Invalid format. Please use DD.MM.YYYY (e.g. 01.05.2024)")
-                
+                        print(
+                            "👉 Invalid format. Please try again "
+                            "(e.g. 01.05.2024)"
+                        )
             while True:
-                start = input_date("\nEnter the start date for your report (DD.MM.YYYY):\n> ")
-                end = input_date("\nEnter the end date for your report (DD.MM.YYYY):\n> ")
+                start = input_date(
+                    "\nEnter the start date for your report (DD.MM.YYYY):\n> "
+                )
+                end = input_date(
+                    "\nEnter the end date for your report (DD.MM.YYYY):\n> "
+                )
                 if start > end:
-                    print("⚠️ Start date cannot be after end date. Please try again.\n")
+                    print(
+                        "👉 Start date cannot be after end date. "
+                        "Please try again.\n"
+                    )
                 else:
                     break
 
-            print("""\nIf present, how do you wish to handle your all-day working events? 
-        1. Omit
-        2. Count them as 8hr shifts
-        3. Count them as 24hr shifts""")
+            print("""
+\nIf present, how do you wish to handle your all-day working events?
+-------------------------------------------
+1. Omit
+2. Count them as 8hr shifts
+3. Count them as 24hr shifts
+-------------------------------------------
+            """)
             all_day_options = {
                 "1": "omit",
                 "2": "8h",
