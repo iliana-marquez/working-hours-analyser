@@ -362,7 +362,7 @@ Thank you for using the Working Hours Analyser! Goodbye, Iliana!
    - print_shifts_report()
 
 ### Main()
-   Collects period and all-day policy from user input to pass it to Report class to create a report instance
+   Collects period and all-day policy from user input to pass it to Report class to create a report instance.
    - all_day_policy: ('omit', '8hr', '24hr')
    - start_date: date
    - end_date: date
@@ -381,17 +381,24 @@ Thank you for using the Working Hours Analyser! Goodbye, Iliana!
 - **re**: Enables pattern matching and text searching using regular expressions.
 
 ### Scope
-- Google Sheets: `https://www.googleapis.com/auth/spreadsheets`
-- Drive (File): `https://www.googleapis.com/auth/drive.file`
-- Drive: `https://www.googleapis.com/auth/drive`
-- Calendar (Read-Only): `https://www.googleapis.com/auth/calendar.readonly`
+````
+SCOPE = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive.file",
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/calendar.readonly"
+]
+````
 
 ### Globals
-- `CREDS`: Loaded from `creds.json` via service account
-- `SCOPE_CREDS`: Credentials with defined scopes
-- `GSPREAD_CLIENT`: Authorized gspread client
-- `SHEET`: Opened 'working-hours-reports' sheet
-- `CALENDAR_SERVICE`: Built for Calendar API v3
+- `CREDS`: Loaded from `creds.json` via service account.
+- `SCOPE_CREDS`: Credentials with defined scopes.
+- `GSPREAD_CLIENT`: Authorized gspread client.
+- `SHEET`: Opened 'working-hours-reports' sheet.
+- `CALENDAR_SERVICE`: Built for Calendar API v3.
+- `WEEKDAYS_ORDERED`: Ordered list of weekdays for calculation logic.
+- `WEEKDAY_ALIASES`: Maps broader variations of weekday inputs to standard weekday names (e.g., for flexible input matching).
+- `_has_shown_calendar_id_help`: Flag to indicate whether calendar ID help has already been shown.
 
 ### Connection Test
 - Tested dependencies locally and on deployed Heroku app and moved testing code to test.py
