@@ -43,7 +43,7 @@
 >- [Acknowledgments](#acknowledgments)
 >- [Key Takeaways](#key-takeaways)
 
-
+---
 ## Overview
 The **Working Hours Analyser** is a command-line tool that automates the tracking of work hours by connecting to your Google Calendar. It transforms scheduled events into precise work hour reports, accounting for public holidays and vacation entries to deliver accurate insights.
 
@@ -105,6 +105,7 @@ Say goodbye to manually tracking shifts in notebooks or clunky spreadsheets! Thi
 - **Consistency**: Uniform tone ("Great!"), separators ("---"), and options ("continue/back/exit")
 - **Engagement**: Friendly emojis (😊, 🎉, etc.) and personalized feedback (e.g., "Goodbye, Iliana!")
 
+---
 ## Development Process
 
 ### Project Planning
