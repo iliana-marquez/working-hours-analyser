@@ -86,7 +86,7 @@ class User:
             weekly_contract_hours,
             contract_working_weekdays
         )
-    
+
     @staticmethod
     def get_contract_working_weekdays() -> List[int]:
         """
@@ -103,7 +103,7 @@ class User:
         while True:
             choice = input("Type the selected option number:\n> ").strip()
             if choice == '1':
-                return list(range(0, 5)) 
+                return list(range(0, 5))
             elif choice == '2':
                 return list(range(0, 6))
             elif choice == '3':
@@ -120,7 +120,8 @@ class User:
         """
         To transform the custom input into clean and valid output for
         get_contract_working_weekdays():
-        - Mixed input: Ranges and individual days (e.g. mon-th sa or mo - we sun)
+        - Mixed input: Ranges and individual days
+        (e.g. mon-th sa or mo - we sun)
         - Orders by weekday
         """
         print("\nEnter your working days (mon, tue, wed, thu, fri, sat, sun):")
