@@ -272,13 +272,14 @@ def get_and_validate_calendar_id(
                 return calendar_id
 
         except Exception as e:
-            print(f"🤔 Could not access this calendar.\n")
+            print("🤔 Could not access this calendar.\n")
             if "notFound" in str(e) or "403" in str(e):
                 print("""👉  Please make sure:
-- The calendar ID exists.
-- You've shared this calendar with the service account:
+- The calendar ID is correct.
+- The calendar is shared with the service account:
   working-hours-analyser-sa@working-hours-analyser.iam.gserviceaccount.com
-- If it's an organization calendar, ensure it has at least 'See all event details' permission.
+- The service account has at least 'See all event details' permission.
+- If it's a Google Workspace calendar, check admin sharing restrictions.
 """)
             print("Try again or type 'exit' to cancel.\n")
 
