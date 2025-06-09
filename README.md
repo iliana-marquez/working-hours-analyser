@@ -33,6 +33,7 @@
 >     - [Scope](#scope)
 >     - [Globals](#globals)
 >     - [Connection Test](#connection-test)
+>     - [Classes Development](#classes-development)
 >     - [Bug Fixes & Validation](#bugs--issues-found-during-development)
 >     - [Code Validation](#code-validation)
 >- [Testing](#testing)
@@ -408,7 +409,7 @@ SCOPE = [
 
 ### Classes Development 
    > **⚠️ Important Note on `cls` Convention**: <br> Instead of the conventional `cls`, class methods use descriptive names like `user_class` or `calendar_class` to clearly indicate the class being instantiated. This choice was made intentionally to aid learning, improve readability and ease debugging - especially for those new to OOP concepts.
-   
+
 - Develop **User Class**, test locally and on deployed heroku app
       ![alt text](/assets/doc-images/user-class-test.png)
 - Develop **Calendar Class**, test locally and on deployed heroku app
