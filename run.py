@@ -59,12 +59,13 @@ class User:
             print("Please type your name.")
         while True:
             country_code = input(
-                "\nPlease enter your country's two-letter code (e.g., 'AT' for Austria):\n> "
+                "\nPlease enter your country's two-letter code"
+                " (e.g., 'AT' for Austria):\n> "
             ).strip()
             if len(country_code) == 2 and country_code.isalpha():
                 break
             print(
-                "Your country code must be exactly two letters, please try again."
+                "\n👉 Your country code must be exactly two letters."
             )
         while True:
             hours_input = input(
@@ -75,7 +76,8 @@ class User:
                 break
             except ValueError:
                 print(
-                    "Please enter a valid number (e.g., 26.5) for calculations."
+                    "\n👉 Please enter a valid number (e.g., 26.5)"
+                    " for calculations."
                 )
 
         contract_working_weekdays = user_class.get_contract_working_weekdays()
@@ -176,7 +178,12 @@ Try again."
                 continue
 
             seen = set()
-            unique_days = [d for d in range(7) if d in selected_days and not (d in seen or seen.add(d))]
+            unique_days = [
+                d for d in range(7)
+                if d in selected_days and not (
+                    d in seen or seen.add(d)
+                )
+            ]
             if unique_days:
                 return unique_days
             print("Invalid format. Try again using day names (e.g ''Mon Wed Fri') and/or ranges (e.g Wed-Fri)")
