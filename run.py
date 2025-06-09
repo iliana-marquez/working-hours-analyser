@@ -154,7 +154,10 @@ class User:
                     if start_index <= end_index:
                         selected_days.extend(range(start_index, end_index + 1))
                     else:
-                        selected_days.extend(list(range(start_index, 7)) + list(range(0, end_index + 1)))
+                        selected_days.extend(
+                            list(range(start_index, 7)) +
+                            list(range(0, end_index + 1))
+                        )
                 else:
                     entry_clean = entry.lower().strip()
                     day = WEEKDAY_ALIASES.get(entry_clean)
