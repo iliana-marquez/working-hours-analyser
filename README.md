@@ -442,7 +442,7 @@ SCOPE = [
       events = self.fetch_filtered_events(start_date, end_date) 
       ````
 - **Vacation Events Spanning Outside the Date Range**
-   - **Issue** Vacation events were counted in full if one event passed over the range of a given period of time, the days outside thr range would be counted as well
+   - **Issue**: Vacation events spanning beyond the given time range were counted in full, including days outside the specified period.
    - **Fix**: Clip the start and date of the given period to the user-specified date range to count only the days within this range.
       ```
       clipped_start = max(date_start, start_date)
@@ -558,6 +558,7 @@ SCOPE = [
   - Checked indentation, line length, and naming conventions
   - Fixed issues like missing whitespace around operators -->
 
+---
 ## Testing
 
 ### Manual Testing Procedure
@@ -580,6 +581,7 @@ SCOPE = [
    - Grant at least read-only / show all details access to: `working-hours-analyser-sa@working-hours-analyser.iam.gserviceaccount.com`
    - **Note***: Hidden details in calendars won’t be handled and return no events
 
+---
 ## Future Enhancements
 - **Custom All-Day Policy**: Allow users to input a custom hour value for all-day events.
 - **Sick Days**: Handle sick days based on country rules and doctor’s notes.
@@ -598,10 +600,12 @@ SCOPE = [
    - **Reporting & Output**
       - As a user, I want a written report (worksheet) for personal use, invoicing, or sharing with bosses/clients
 
+---
 ## Acknowledgments
 - **Code Institute**: For the P3 template and the `love_sandwiches` walkthrough, which inspired automated Google Sheets interaction
 - All external code from libraries (`gspread`, `google-api-python-client`, `holidays`) sourced from PyPI
 
+---
 ## Key Takeaways
 - **Plan First**: Simulate desired outcomes to identify tasks and actors
 - **OOP Power**: Use encapsulation, abstraction, inheritance, and polymorphism for modular, scalable code
