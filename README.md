@@ -218,9 +218,8 @@ Say goodbye to manually tracking shifts in notebooks or clunky spreadsheets! Thi
    ---------------------------------------------------
    Processing your request... 
    ---------------------------------------------------
-   🧠 Analyzing data for Iliana from 01.01.2025 to 01.02.2025
+   🧠 Analysing data for Iliana from 01.01.2025 to 01.02.2025
    (excluding working-week public holidays and vacation days)...
-   ⌛ This may take a moment as we fetch events.
 
    ---------------------------------------------------
    Your Working Hours Report: May 2024
@@ -261,7 +260,7 @@ Say goodbye to manually tracking shifts in notebooks or clunky spreadsheets! Thi
    ---------------------------------------------------
    Name: Iliana
    Report Period: 01.05.2024 - 31.05.2024
-   Working Week: Mo- Fr / 26.5hrs
+   Working Week: Mo-Fr / 26.5hrs
    Total Nr. of Shifts: 5
    02.05.2024 09:00 - 17:00: Team Sync (8.0 hrs)
    03.05.2024 09:00 - 16:30: Project X Deep Dive (7.5 hrs)

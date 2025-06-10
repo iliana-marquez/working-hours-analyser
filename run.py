@@ -191,13 +191,40 @@ Try again."
                 "(e.g ''Mon Wed Fri') and/or ranges (e.g Wed-Fri)"
             )
 
+    def working_week_display(self) -> str:
+        """
+        Returns a string like Mon-Thu, Sat from working week indexes
+        """
+        days = sorted(set(self.contract_working_weekdays))
+        if not days:
+            return ""
+
+        result = []
+        start = prev = days[0]
+
+        for day in days[1:] + [None]:
+            if day == prev + 1:
+                prev = day
+            else:
+                if start == prev:
+                    result.append(WEEKDAYS_ORDERED[start].capitalize())
+                else:
+                    result.append(
+                        f"{WEEKDAYS_ORDERED[start].capitalize()}-"
+                        f"{WEEKDAYS_ORDERED[prev].capitalize()}"
+                    )
+                if day is not None:
+                    start = prev = day
+
+        return ", ".join(result)
+
     def get_contract_working_weekdays_dates(
             self,
             start_date: date,
             end_date: date
     ) -> Set[date]:
         """
-        Return the set of dates between start_date and end_date
+        Returns the set of dates between start_date and end_date
         that fall on contract working weekdays.
         Used to filter holidays that actually fall on working days.
         """
@@ -773,16 +800,23 @@ class Report:
         if show_shifts_report in ("yes", "y"):
             self.print_shifts_report()
 
+    def print_user_work_data(self):
+        """
+        User workday data report banner
+        """
+        print(f"👤 Name: {self.user.name}\n")
+        print(f"📊 Report Period: {self.start_date.strftime('%d.%m.%Y')} - "
+              f"{self.end_date.strftime('%d.%m.%Y')}\n")
+        print(f"💼 Working Week: {self.user.working_week_display()} / "
+              f"{self.user.weekly_contract_hours} hrs\n")
+
     def print_hours_report(self):
         print("\n---------------------------------------------------")
         print(
             f"Your Working Hours Report: {self.start_date.strftime('%B %Y')}"
         )
         print("---------------------------------------------------")
-        print(f"👤 Name: {self.user.name}\n")
-        print(f"📊 Report Period: {self.start_date.strftime('%d.%m.%Y')} - "
-              f"{self.end_date.strftime('%d.%m.%Y')}\n")
-
+        self.print_user_work_data()
         expected_hours = round(self.calculate_expected_working_hours(), 2)
         actual_hours = round(self.calculate_actual_working_hours(), 2)
         difference = round(actual_hours - expected_hours, 2)
@@ -809,16 +843,12 @@ class Report:
         print("---------------------------------------------------")
         print(f"Your Days Report: {self.start_date.strftime('%B %Y')}")
         print("---------------------------------------------------")
-        print(f"👤 Name: {self.user.name}\n")
-        print(
-            f"📊 Report Period: {self.start_date.strftime('%d.%m.%Y')} - "
-            f"{self.end_date.strftime('%d.%m.%Y')}\n"
-        )
+        self.print_user_work_data()
         print(
             "📅 Expected working days: "
             f"{self.calculate_expected_working_days()}\n"
         )
-        print(f"✅ Working days: {self.calculate_actual_working_days()}\n")
+        print(f"✅ Worked days: {self.calculate_actual_working_days()}\n")
         print(f"🏖️  Vacation days: {self.calculate_vacation_days_count()}\n")
         print(f"🎉 Public Holiday days: {self.calculate_holiday_days_count()}")
         print("---------------------------------------------------")
@@ -838,13 +868,9 @@ class Report:
         print("---------------------------------------------------")
         print(f"Your Shifts Report: {self.start_date.strftime('%B %Y')}")
         print("---------------------------------------------------")
-        print(f"👤  Name: {self.user.name}\n")
-        print(
-            f"📊  Report Period: {self.start_date.strftime('%d.%m.%Y')} - "
-            f"{self.end_date.strftime('%d.%m.%Y')}\n"
-        )
+        self.print_user_work_data()
         count_shifts = len(self.shifts)
-        print(f"✅  {count_shifts} Total Shifts\n")
+        print(f"✅ {count_shifts} Total Shifts\n")
 
         for shift in self.shifts:
             date_str = shift["start"].strftime("%d.%m.%Y")
@@ -948,9 +974,9 @@ def main():
                 "\n---------------------------------------------------"
             )
             print(
-                f"🧠 Analyzing {user.name}'s data from "
+                f"🧠 Analysing {user.name}'s data from "
                 f"{start.strftime('%d.%m.%Y')} to {end.strftime('%d.%m.%Y')}\n"
-                "(excluding working-week public holidays and vacation days)..."
+                "(excluding working-week public holidays & vacation days)...\n"
             )
             report = Report(
                 user,
@@ -971,7 +997,7 @@ def main():
                     "during this period.\n"
                 )
                 retry = input(
-                    "Would you like to try a different date range? "
+                    "Would you like to start again? "
                     "(yes/no)\n> "
                 ).strip().lower()
                 if retry in ("yes", "y"):
@@ -983,7 +1009,7 @@ def main():
                     print(
                         "\n👋 Thank you for using the Working Hours Analyser. "
                         "Goodbye!")
-                    return
+                    break
             else:
                 report.print_summary()
 
