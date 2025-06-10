@@ -854,8 +854,8 @@ class Report:
             )
             duration = round(shift["duration"], 1)
             print(
-                f"👉 {date_str} {time_range}: {shift['title']} "
-                f"({duration} hrs)"
+                f"👉 {date_str} {time_range} ({duration} hrs) "
+                f"{shift['title']}"
             )
         print("---------------------------------------------------")
 
@@ -944,9 +944,9 @@ def main():
                 "This may take a moment as we fetch events."
             )
             print(
-                f"🧠 Analyzing data for {user.name} from"
-                f"{start.strftime('%d.%m.%Y')} to {end.strftime('%d.%m.%Y')} "
-                "(excluding public holidays and vacation events)..."
+                f"🧠 Analyzing data for {user.name} from "
+                f"{start.strftime('%d.%m.%Y')} to {end.strftime('%d.%m.%Y')}\n"
+                "(excluding working-week public holidays and vacation days)..."
             )
             report = Report(
                 user,
