@@ -102,9 +102,9 @@ Say goodbye to manually tracking shifts in notebooks or clunky spreadsheets! Thi
 ## UX Features
 - **Clarity**: Concise prompts with examples (e.g. "Mon-Fri").
 - **Efficiency**: Single report menu and separate ID / filter prompts.
-- **Error Prevention/Recovery**: Specific error feedback (e.g., "Invalid .calendar ID")
-- **Consistency**: Uniform tone ("Great!"), separators ("---"), and options ("continue/back/exit")
-- **Engagement**: Friendly emojis (😊, 🎉, etc.) and personalized feedback (e.g., "Goodbye, Iliana!")
+- **Error Prevention/Recovery**: Specific error feedback (e.g., "Invalid .calendar ID").
+- **Consistency**: Uniform tone ("Great!"), separators ("---"), and options ("continue/back/exit").
+- **Engagement**: Friendly emojis (😊, 🎉, etc.) and personalized feedback (e.g., "Goodbye, Iliana!").
 
 ---
 ## Development Process
@@ -343,7 +343,7 @@ Say goodbye to manually tracking shifts in notebooks or clunky spreadsheets! Thi
 - get_vacation_days(start_date: date, end_date: date) -> set
 - calculate_vacation_days(start_date, end_date) -> int
 
-🇦🇹 **HolidayCalendar** (not a calendar, wraps the holidays package)
+🌎 **HolidayCalendar** (not a calendar, wraps the holidays package)
 - country_code: str
 - fetch_holidays(start_date, end_date, country_code) -> List[Dict[str, any]]
 - count_holidays(start_date, end_date) -> int
@@ -376,10 +376,10 @@ Say goodbye to manually tracking shifts in notebooks or clunky spreadsheets! Thi
    - Report.print_summary()
 
 ### Dependencies
-- **gspread**: Essential for connecting to and updating Google Sheets for report storage
-- **google.oauth2.service_account.Credentials**: Required for secure authentication with Google APIs via service account
-- **google hammapiclient.discovery.build**: Necessary to build a client for Google Calendar API to fetch events
-- **holidays**: Critical for fetching country-specific public holidays to exclude from work hour calculations
+- **gspread**: Essential for connecting to and updating Google Sheets for report storage.
+- **google.oauth2.service_account.Credentials**: Required for secure authentication with Google APIs via service account.
+- **google hammapiclient.discovery.build**: Necessary to build a client for Google Calendar API to fetch events.
+- **holidays**: Critical for fetching country-specific public holidays to exclude from work hour calculations.
 
 ### Python Libraries
 - **datetime**: Provides tools for manipulating dates and times, such as creating, formatting, and comparing them.
@@ -556,6 +556,9 @@ SCOPE = [
    ---
    - **Bug**: When no events were found, the app still attempted to generate a report.
    - **Fix**: Added a conditional check — if no events are found, the report is skipped and the user is notified.
+   ---
+   - **Bug**: Vacation days were being counted even when they fell outside the contractual working week.
+   - **Fix**: Updated the logic to exclude non-contractual days from `adjusted_vacation_days`, so only vacation days that fall within the working week are counted.
 
 
 ### Code Validation
@@ -617,8 +620,8 @@ SCOPE = [
 
 ---
 ## Key Takeaways
-- **Plan First**: Simulate desired outcomes to identify tasks and actors
-- **OOP Power**: Use encapsulation, abstraction, inheritance, and polymorphism for modular, scalable code
-- **User Focus**: Solve familiar problems, then scale to collective needs
-- **Simplicity**: Keep it simple for easier development and debugging
-- **Critical Thinking**: Identifying objects and responsibilities transcends tech stack, enabling faster learning of new languages or tools
+- **Plan First**: Simulate desired outcomes to identify tasks and actors.
+- **OOP Power**: Use encapsulation, abstraction, inheritance, and polymorphism for modular, scalable code.
+- **User Focus**: Solve familiar problems, then scale to collective needs.
+- **Simplicity**: Keep it simple for easier development and debugging.
+- **Critical Thinking**: Identifying objects and responsibilities transcends tech stack, enabling faster learning of new languages or tools.
