@@ -240,7 +240,7 @@ def get_and_validate_calendar_id(
     global _has_shown_calendar_id_help
     calendar_id_pattern = r"^[^@]+@[^@]+\.[^@]+$"
     if show_help_if_first_time and not _has_shown_calendar_id_help:
-        print("\nNow, let's get your Google calendar ID.")
+        print("\nNow, let's get your Google calendar ID\n.")
         print("🔍 Do you know where to find it? (yes/no)")
         response = input("> ").strip().lower()
         if response not in ("yes", "y"):
@@ -866,16 +866,18 @@ Helper and flow methods
 
 
 def print_banner():
-    print("---------------------------------------------------")
+    print("\n---------------------------------------------------")
     print("👋 Welcome to Working Hours Analyser 🔍")
     print("---------------------------------------------------")
-    print("📆 No more spreadsheets — track time effortlessly!\n")
-    print("⏱️  This tool connects to your Google Calendar and automatically")
-    print("calculates actual vs. expected hours, time balance,")
-    print("vacations, holidays and gives you a clean shift summary.\n")
-    print("🔧 All you'll need:")
-    print("Calendar ID(s), contract hours & a date range.\n")
-    print("Don't worry - the setup is fully guided and takes less than a min.")
+    print("\n📆 Say goodbye to clunky spreadsheets!\n")
+    print("This tool connects with your Google Calendar to track:\n")
+    print("   • Actual vs. expected hours")
+    print("   • Workdays, vacation & public holidays")
+    print("   • Detailed shift breakdowns\n")
+    print("🔧 Setup takes less than 1 minute, just:\n")
+    print("   1️⃣  Enter your Info, Working Perks & Report Period")
+    print("   2️⃣  Get your Google calendar ID(s) and...\n")
+    print("Voilà! Report delivered 🚀\n")
     print("---------------------------------------------------")
     print("Let's get your time tracking sorted 👍")
     print("---------------------------------------------------")
@@ -939,12 +941,14 @@ def main():
             work_calendar = get_calendar_data()
             vacation_calendar = get_vacation_calendar()
             holiday_calendar = get_holiday_calendar(user.country_code)
+
             print(
-                "\nProcessing your request... ⌛ "
-                "This may take a moment as we fetch events."
+                "\n---------------------------------------------------"
+                "\nProcessing your request... "
+                "\n---------------------------------------------------"
             )
             print(
-                f"🧠 Analyzing data for {user.name} from "
+                f"🧠 Analyzing {user.name}'s data from "
                 f"{start.strftime('%d.%m.%Y')} to {end.strftime('%d.%m.%Y')}\n"
                 "(excluding working-week public holidays and vacation days)..."
             )
@@ -964,7 +968,7 @@ def main():
             ):
                 print(
                     "\n👉 No working events found in the selected calendars "
-                    "during this period."
+                    "during this period.\n"
                 )
                 retry = input(
                     "Would you like to try a different date range? "

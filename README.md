@@ -117,43 +117,43 @@ Say goodbye to manually tracking shifts in notebooks or clunky spreadsheets! Thi
    ```
    $ python run.py
    ---------------------------------------------------
-   👋  Welcome to the Working Hours Analyser!
+   👋 Welcome to Working Hours Analyser 🔍
    ---------------------------------------------------
 
-   Say goodbye to clunky spreadsheets! 
+   📆 Say goodbye to clunky spreadsheets!
 
-   This tool uses your Google Calendar to track:
-   - Actual vs. expected hours
-   - Workdays, vacation & public holidays
-   - Detailed shift breakdowns
+   This tool connects with your Google Calendar to track:
+   
+      • Actual vs. expected hours
+      • Workdays, vacation & public holidays
+      • Detailed shift breakdowns
 
-   What you'll need: calendar ID(s), contract hours, report period.
+   🔧 Setup takes less than 1 minute, just: 
+      
+      1️⃣  Enter your Info & Calendar ID(s)
+      2️⃣  Set your report period and...
 
-
-   We'll guide you through 4 quick steps:
-   1) Your info
-   2) Calendar setup
-   3) Report period
-   4) Results
-
-   Don't worry – it only takes ~1 minute!
-
+   Voilà! Report delivered 🚀
 
    ---------------------------------------------------
-   Step 1: Your Info
-   ----------------------------------------------------
+   Let's get your time tracking sorted 👍
+   ---------------------------------------------------
    Enter your name: 
    > Iliana
 
-   Enter your weekly contract hours (e.g., 26.5):
+   Please enter your country's two-letter code (e.g., 'AT' for Austria):
+   > AT
+   
+   What are your weekly contract hours (e.g., 26.5)?
    > 26.5
-
-   Select your standard working week:
+   
+   What is your standard working week?
+   -------------------------------------------
    1. Mon–Fri
    2. Mon–Sat
    3. Flexible (Every day)
    4. Custom (Other specific days or range)
-
+   -------------------------------------------
    Type the selected option number: 
    > 4
 
@@ -165,13 +165,23 @@ Say goodbye to manually tracking shifts in notebooks or clunky spreadsheets! Thi
    ------------------------------------------------------------
    > Mo-fri
 
-   Enter your country’s two-letter code for holidays (e.g., ‘AT’ for Austria):
-   > AT
+   Enter the start date for your report (DD.MM.YYYY):
+   > 01.05.2024
 
-   ---------------------------------------------------
-   Step 2: Calendar Setup
-   ---------------------------------------------------
-   Now need the ID(s) of the calendar(s) you want to analyse. Know where to find it? (yes / no)
+   Enter the end date for your report (DD.MM.YYYY):
+   > 31.05.2024
+
+   If present, how do you wish to handle your all-day working events? 
+   -------------------------------------------
+   1. Omit
+   2. Count them as 8hr shifts
+   3. Count them as 24hr shifts 
+   -------------------------------------------
+   Type the selected option number:
+   >
+
+   Now, let's get your Google calendar ID.
+   🔍 Do you know where to find it? (yes/no)
    (If yes continue to next question, if not present instructions:)
    —----
    How to Find Your Google Calendar ID
@@ -183,8 +193,8 @@ Say goodbye to manually tracking shifts in notebooks or clunky spreadsheets! Thi
    6. Copy this Calendar ID and paste it into the application when prompted.
    —----
 
-   Please enter the ID of your work calendar (e.g., 'primary'):
-   130117b726fac70ced@group.calendar.google.com
+   Please enter the ID of the calendar that holds your WORK events 💼 :
+   > 130117b726fac70ced@group.calendar.google.com
 
    Enter a keyword or event title to filter your work events or press enter to skip.
    >
@@ -198,33 +208,19 @@ Say goodbye to manually tracking shifts in notebooks or clunky spreadsheets! Thi
    - If your calendar is in a Google Workspace org, check sharing restrictions.
    """)
 
-   Please enter the Calendar ID of your vacation calendar:
+   Please enter the ID of the calendar that holds your VACATION events 🏖️ :
    > mitarbeiter_urlaub
 
-   Optionally, enter a keyword or event title to filter vacation events  (e.g., 'Urlaub Iliana'), or press Enter to skip: 
+   Enter a keyword or event title to filter your vacation events (or press Enter to skip):
    > Urlaub Iliana
 
-   ---------------------------------------------------
-   Step 3: Report Period
-   ---------------------------------------------------
-   Enter the start date for your report (DD.MM.YYYY):
-   > 01.05.2024
-
-   Enter the end date for your report (DD.MM.YYYY):
-   > 31.05.2024
-
-   If present, how do you wish to handle your all-day events? 
-   1. Omit"
-   2. Count them as 8hr shifts"
-   3. Count them as 24hr shifts "
-   Type the selected option number:
-   >
 
    ---------------------------------------------------
-   Step 4: Results
+   Processing your request... 
    ---------------------------------------------------
-   >>> Processing your request... This may take a moment as we fetch events.
-   >>> Analyzing data for Iliana from 01.05.2024 to 31.05.2024 (excluding public holidays and 'Urlaub Iliana' from 'mitarbeiter_urlaub')...
+   🧠 Analyzing data for Iliana from 01.01.2025 to 01.02.2025
+   (excluding working-week public holidays and vacation days)...
+   ⌛ This may take a moment as we fetch events.
 
    ---------------------------------------------------
    Your Working Hours Report: May 2024
