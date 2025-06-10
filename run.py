@@ -666,15 +666,16 @@ class Report:
         self.overlapping_days: Set[date] = (
             self.vacation_days & self.holiday_days
         )
-        # Adjust vacation days by removing overlapping holidays
-        self.adjusted_vacation_days: Set[date] = (
-            self.vacation_days - self.overlapping_days
-        )
-        # Only count holidays that are working days & dont overlap vacation
+        # Contract working weekdays
         contract_workdays = self.user.get_contract_working_weekdays_dates(
             start_date,
             end_date
         )
+        # Adjust vacation days (remove overlapping holidays & non workdays)
+        self.adjusted_vacation_days: Set[date] = (
+            (self.vacation_days - self.overlapping_days) & contract_workdays
+        )
+        # Only count holidays that are working days & dont overlap vacation
         self.adjusted_holiday_days: Set[date] = {
             day for day in self.holiday_days
             if day in contract_workdays and day not in self.vacation_days
