@@ -555,8 +555,8 @@ SCOPE = [
    - **Bug**: Vacation days were being counted even when they fell outside the contractual working week.
    - **Fix**: Updated the logic to exclude non-contractual days from `adjusted_vacation_days`, so only vacation days that fall within the working week are counted.
    ---
-   - **Issue**: Looping through the reporting, by keeping User data and making a new report or restarting the application was not very well UX/designed.
-   - **Fix**: Split Main() function into separete methods to gather and process the data so it can be looped to specific septs throughout the CLI flow.
+   - **Issue**: Looping through the reporting, by keeping User data and making a new report or restarting the application was not UX oriented.
+   - **Fix**: Split Main() function into separete methods to gather and process the data so it can be looped to specific steps throughout the CLI flow.
 
 
 ### Code Validation
