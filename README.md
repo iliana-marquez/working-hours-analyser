@@ -554,6 +554,9 @@ SCOPE = [
    ---
    - **Bug**: Vacation days were being counted even when they fell outside the contractual working week.
    - **Fix**: Updated the logic to exclude non-contractual days from `adjusted_vacation_days`, so only vacation days that fall within the working week are counted.
+   ---
+   - **Issue**: Looping through the reporting, by keeping User data and making a new report or restarting the application was not very well UX/designed.
+   - **Fix**: Split Main() function into separete methods to gather and process the data so it can be looped to specific septs throughout the CLI flow.
 
 
 ### Code Validation
@@ -593,6 +596,7 @@ SCOPE = [
 - **Sick Days**: Handle sick days based on country rules and doctor’s notes.
 - **Time Bonuses**: Calculate bonuses for after-hours, weekends, or holidays (e.g., in Austria, post-18:30 hours = 1.5x).
 - **Input Validation**: Instant feedback for incorrect user inputs (e.g., typo in name, incorrect workig week hours number, etc.).
+- **Calender Validation**: Add an elegant flow to loop to the start or exit if desired by the user, at the moment, the only options are try again (to entry the ID) or type cancel to exit (Operation cancelled).
 - **User Confirmation**: Display entered data (calendar IDs, filters) for confirmation before printing report.
 - **Written Reports**: Export reports via gspread or JSON for API use.
 - **Broader Calendar Support**: Integrate CalDAV for non-Google calendars.
