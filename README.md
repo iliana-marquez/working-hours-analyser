@@ -580,19 +580,20 @@ SCOPE = [
 - **Outcome**: Confirmed accuracy of report restults with data of shifts by verifying report result data with period range and shifts sum
 
 ### Test Calendars
-- **Iliana**: `
+- **Iliana**:
     > vcrk5gevoffaskkl57rbl3q1n8@group.calendar.google.com
 - **Cesar** (starts 01.03.2025):
-    > 66bf19679262cea6dda330aa828b21fcd59399f1fe0969130117b726fac70ced@group.calendar.google.com`
+    > 66bf19679262cea6dda330aa828b21fcd59399f1fe0969130117b726fac70ced@group.calendar.google.com
 - **Angela** (ends 28.02.25):
     > s2msasa4r6ppgpauhjt9h0enu8@group.calendar.google.com
 - **Urlaube-Mitarbeiter** (keywords: `urlaub cesar`, `urlaub iliana`, `urlaub angela`):
-    > 11knrbjev3res0paa1gkcuq9js@group.calendar.google.com`
+    > 11knrbjev3res0paa1gkcuq9js@group.calendar.google.com
 
 ### Service Account
 - If you want to get reports on your own calenders:
-   - Grant at least read-only / show all details access to: `working-hours-analyser-sa@working-hours-analyser.iam.gserviceaccount.com`
-   - **Note***: Hidden details in calendars won’t be handled and return no events
+   - Grant at least read-only / show all details access to:
+     > working-hours-analyser-sa@working-hours-analyser.iam.gserviceaccount.com
+   - **Note!**: Hidden details in calendars won’t be handled and return no events.
 
 ---
 ## Future Enhancements
