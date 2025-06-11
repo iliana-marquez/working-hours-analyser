@@ -542,7 +542,7 @@ SCOPE = [
    - **Fix**: Add instructions on how to add the service to the calendar and grant access to it.
    ---
    - **Issue**: Users my have added the servie to the calendar, but not granted the needed access of at least read only show all details
-   - **Cause**: Some corporate calendars may restrict access to external accounts or user might not know hot to grant the needed access.
+   - **Cause**: Some corporate calendars may restrict access to external accounts or user might not know how to grant the needed access.
    - **Fix**: Inform user if permissions are missing, show the exact steps to grant the needed access to the service account and highlight potential Google Workspace admin restrictions.
 
 - **Last Minute Bugs**
@@ -580,10 +580,14 @@ SCOPE = [
 - **Outcome**: Confirmed accuracy of report restults with data of shifts by verifying report result data with period range and shifts sum
 
 ### Test Calendars
-- **Iliana**: `vcrk5gevoffaskk157rbl3q1n8@group.calendar.google.com`
-- **Cesar** (starts 01.03.2025): `66bf19679262cea6dda330aa828b21fcd59399f1fe0969130117b726fac70ced@group.calendar.google.com`
-- **Angela** (ends 28.02.25): `s2msasa4r6ppgpauhjt9h0enu8@group.calendar.google.com`
-- **Urlaube-Mitarbeiter** (keywords: `urlaub cesar`, `urlaub iliana`, `urlaub angela`): `11knrbjev3res0paa1gkcug9js@group.calendar.google.com`
+- **Iliana**: `
+    > vcrk5gevoffaskkl57rbl3q1n8@group.calendar.google.com
+- **Cesar** (starts 01.03.2025):
+    > 66bf19679262cea6dda330aa828b21fcd59399f1fe0969130117b726fac70ced@group.calendar.google.com`
+- **Angela** (ends 28.02.25):
+    > s2msasa4r6ppgpauhjt9h0enu8@group.calendar.google.com
+- **Urlaube-Mitarbeiter** (keywords: `urlaub cesar`, `urlaub iliana`, `urlaub angela`):
+    > 11knrbjev3res0paa1gkcuq9js@group.calendar.google.com`
 
 ### Service Account
 - If you want to get reports on your own calenders:
