@@ -586,7 +586,7 @@ SCOPE = [
     > 66bf19679262cea6dda330aa828b21fcd59399f1fe0969130117b726fac70ced@group.calendar.google.com
 - **Angela** (ends 28.02.25):
     > s2msasa4r6ppgpauhjt9h0enu8@group.calendar.google.com
-- **Urlaube-Mitarbeiter** (keywords: `urlaub cesar`, `urlaub iliana`, `urlaub angela`):
+- **Vacations Calendar** (keywords: `urlaub cesar`, `urlaub iliana`, `urlaub angela`):
     > 11knrbjev3res0paa1gkcuq9js@group.calendar.google.com
 
 ### Service Account
