@@ -10,7 +10,7 @@
 
 #### The Result:
 
-> ### [Working Hours Analyser Tool](https://working-hours-analyser-1a0bd1b9ba29.herokuapp.com/) 🔗 <br><br> ![alt text](/assets/doc-images/image.png)
+> ### [Working Hours Analyser Tool](https://working-hours-analyser-1a0bd1b9ba29.herokuapp.com/) 🔗 <br><br> ![alt text](/assets/doc-images/cover.png)
 
 #### The Details:
 >- [Overview](#overview)
