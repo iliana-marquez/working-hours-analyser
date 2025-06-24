@@ -38,8 +38,7 @@
 >     - [Code Validation](#code-validation)
 >- [Testing](#testing)
 >     - [Manual Testing Procedure](#manual-testing-procedure)
->     - [Test Calendars](#test-calendars)
->     - [Service Account](#service-account)
+>- [Use with Your Own Calendars](#use-with-your-own-calendars)
 >- [Future Enhancements](#future-enhancements)
 >- [Acknowledgments](#acknowledgments)
 >- [Key Takeaways](#key-takeaways)
@@ -571,29 +570,29 @@ SCOPE = [
 ## Testing
 
 ### Manual Testing Procedure
-- **Setup**: Used test calendars (Iliana, Cesar, Angela) and service account for access
+- **Setup**: Used private test calendars and service account for access
 - **Test Cases**:
   - Entered valid/invalid calendar IDs to check validation
-  - Tested date ranges especific ranges for event fetching
+  - Tested date specific ranges for event fetching
   - Verified holiday/vacation exclusion with sample data
   - Tested Calendar with no details access, no report possible. 
-- **Outcome**: Confirmed accuracy of report restults with data of shifts by verifying report result data with period range and shifts sum
+- **Outcome**: Confirmed accuracy of report results with data of shifts by verifying report result data with period range and shifts sum
 
-### Test Calendars
-- **Iliana**:
-    > vcrk5gevoffaskkl57rbl3q1n8@group.calendar.google.com
-- **Cesar** (starts 01.03.2025):
-    > 66bf19679262cea6dda330aa828b21fcd59399f1fe0969130117b726fac70ced@group.calendar.google.com
-- **Angela** (ends 28.02.25):
-    > s2msasa4r6ppgpauhjt9h0enu8@group.calendar.google.com
-- **Vacations Calendar** (keywords: `urlaub cesar`, `urlaub iliana`, `urlaub angela`):
-    > 11knrbjev3res0paa1gkcuq9js@group.calendar.google.com
+---
+## Use with Your Own Calendars
 
-### Service Account
-- If you want to get reports on your own calenders:
-   - Grant at least read-only / show all details access to:
-     > working-hours-analyser-sa@working-hours-analyser.iam.gserviceaccount.com
-   - **Note!**: Hidden details in calendars won’t be handled and return no events.
+1. **Grant calendar access** to the service account:
+   > working-hours-analyser-sa@working-hours-analyser.iam.gserviceaccount.com
+   - **Permission Level**: "read-only / show all details" (minimum)
+   - **Important**: Calendars with "see only free/busy (hide details)" access will return no events
+
+2. **Work Calendar**: Use any Google Calendar with work events
+3. **Vacation Calendar**: Any Google Calendar with vacation/time-off events
+4. **Use Scenarios**: 
+   - Calendar with mixed event types (meetings, appointments, all-day events)
+   - Calendar with events spanning multiple days
+   - Calendar with events outside your working hours
+   - Empty calendar (to test edge cases)
 
 ---
 ## Future Enhancements
