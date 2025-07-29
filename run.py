@@ -853,12 +853,12 @@ class Report:
         print(f"🎉 Public Holiday days: {self.calculate_holiday_days_count()}")
         print("---------------------------------------------------")
         print("Holidays accounted")
-        for holiday in self.adjusted_holiday_days:
+        for holiday in sorted(self.adjusted_holiday_days):
             date_str = holiday.strftime('%d.%m.%Y')
             print(f"{date_str}")
         print("---------------------------------------------------")
         print("Vacation days accounted")
-        for vacation_day in self.adjusted_vacation_days:
+        for vacation_day in sorted(self.adjusted_vacation_days):
             date_str = vacation_day.strftime('%d.%m.%Y')
             print(f"{date_str}")
         print("---------------------------------------------------")
