@@ -852,8 +852,18 @@ class Report:
         print(f"🏖️  Vacation days: {self.calculate_vacation_days_count()}\n")
         print(f"🎉 Public Holiday days: {self.calculate_holiday_days_count()}")
         print("---------------------------------------------------")
+
+        # Define holiday groups:
+        overlapping_holidays = self.holiday_days & self.vacation_days
+        counted_holidays = self.adjusted_holiday_days
+
         print("Holidays accounted")
-        for holiday in sorted(self.adjusted_holiday_days):
+        for holiday in sorted(counted_holidays):
+            date_str = holiday.strftime('%d.%m.%Y')
+            print(f"{date_str}")
+        print("---------------------------------------------------")
+        print("Holidays during vacation (not counted):")
+        for holiday in sorted(overlapping_holidays):
             date_str = holiday.strftime('%d.%m.%Y')
             print(f"{date_str}")
         print("---------------------------------------------------")
